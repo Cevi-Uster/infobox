@@ -1,0 +1,52 @@
+/** stylesheetfile for the chaeschtlizettel plugin */
+
+.chae-wrapper{
+  background-color: #EAE9E9;
+  border-color: #838282;
+  padding: 6px;
+  margin: 10px
+}
+
+/* dashboard styles */
+.chae-dash-form{
+  margin: 12px;
+  display: block;
+}
+.chae-dash-label{
+  font-size: 1.1em;
+  padding: 5px 8px;
+  color: #72777c;
+  cursor: text;
+}
+.chae-label{
+
+}
+.chae-input-group{
+  margin-top: 2px;
+  margin-bottom: 15px;
+}
+.chae-col-container{
+  display: flex;
+  margin-left: -2.5px;
+  margin-right: -2.5px;
+}
+.chae-col{
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+}
+.chae-col-50{
+  float: both;
+  width: 50%;
+}
+label.hide {
+  display: none;
+}
+
+.chae-last-update{
+  font-size: 11px;
+  margin-top: 1em;
+}
+
+pull-right{
+  float: right;
+}
