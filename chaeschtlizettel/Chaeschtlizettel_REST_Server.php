@@ -11,7 +11,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
  
   public function register_routes() {
     $namespace = $this->my_namespace . $this->my_version;
-    $base      = 'category';
+    $base      = 'stufen';
     register_rest_route( $namespace, '/' . $base, array(
       array(
           'methods'         => WP_REST_Server::READABLE,
