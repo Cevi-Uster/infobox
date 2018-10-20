@@ -14,11 +14,28 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $base      = 'stufen';
     register_rest_route( $namespace, '/' . $base, array(
       array(
-          'methods'         => WP_REST_Server::READABLE,
-          'callback'        => array( $this, 'get_stufen' ),
+          'methods' => WP_REST_Server::READABLE,
+          'callback'  => array( $this, 'get_stufen' ),
           'permission_callback'   => array( $this, 'get_stufen_permission' )
+      )
+    ));
+
+    register_rest_route( $namespace, '/chaeschtlizettel/(?P<id>\d+)', array(
+      array(
+        'methods'  => WP_REST_Server::READABLE,
+        'callback' => array( $this, 'get_chaeschtlizettel' ),
+        'permission_callback'  => array( $this, 'get_chaeschtlizettel_permission' ),
+        'args' => array(
+        'id' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric( $param );
+        }
         )
-    )  );
+      ) 
+    )
+    )
+  );
+
   }
  
   // Register our REST Server
@@ -39,5 +56,26 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     //$sql = $wpdb->prepare($sql_stmt);
     $result = $wpdb->get_results($sql_stmt, OBJECT);
     return $result;
+  }
+
+
+  public function get_chaeschtlizettel_permission(){
+      // Everyone may read this information!
+      return true;
+  }
+
+  public function get_chaeschtlizettel( WP_REST_Request $request ){
+    
+    $stufen_id = $request->get_param('id');
+    $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
+    
+    global $wpdb;
+    $tableName = $chaeschtlizettel_plugin->prefixTableName('chaeschtlizettel');
+    $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
+    $sql = $wpdb->prepare($sql_stmt, $stufen_id);
+
+    $result = $wpdb->get_results($sql);
+    $chaeschtli = $result[0];    //return $chaeschtli;
+    return $chaeschtli;
   }
 }
