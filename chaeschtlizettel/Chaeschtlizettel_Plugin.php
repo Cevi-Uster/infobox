@@ -2,6 +2,8 @@
 
 
 include_once('Chaeschtlizettel_LifeCycle.php');
+include_once('Chaeschtlizettel_REST_Server.php');
+
 
 class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
@@ -340,6 +342,10 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
         // add dashboard widget
         add_action( 'wp_dashboard_setup', array(&$this, 'example_add_dashboard_widgets') );
+
+        // Register REST Server
+        $rest_server = new Chaeschtlizettel_REST_Server();
+        $rest_server->hook_rest_server();
 
     }
 
