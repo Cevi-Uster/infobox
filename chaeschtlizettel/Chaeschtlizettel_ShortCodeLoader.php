@@ -1,10 +1,11 @@
 <?php
 /*
-    "WordPress Plugin Template" Copyright (C) 2018 Michael Simpson  (email : michael.d.simpson@gmail.com)
+    "Chaeschtlizettel Plugin" Copyright (C) 2018 Matthias Kunz v/o Funke  (email : funke.uster@cevi.ch)
+    "Chaeschtlizettel Plugin" is derived from "WordPress Plugin Template" Copyright (C) 2018 Michael Simpson  (email : michael.d.simpson@gmail.com)
 
-    This file is part of WordPress Plugin Template for WordPress.
+    This file is part of WordPress Plugin Chaeschtlizettel for WordPress.
 
-    WordPress Plugin Template is free software: you can redistribute it and/or modify
+    Chaeschtlizettel is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
