@@ -312,6 +312,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // http://plugin.michael-simpson.com/?page_id=47
         add_action('admin_menu', array(&$this, 'addSettingsSubMenuPage'));
 
+
         // Example adding a script & style just for the options administration page
         // http://plugin.michael-simpson.com/?page_id=47
         //        if (strpos($_SERVER['REQUEST_URI'], $this->getSettingsSlug()) !== false) {
@@ -323,31 +324,37 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // http://plugin.michael-simpson.com/?page_id=37
         add_action( 'admin_enqueue_scripts', 'my_enqueue' );
 
+        //add_action('admin_enqueue_scripts', array(&$this, 'enqueueAdminPageStylesAndScripts'));
+
         // Adding scripts & styles to all pages
         // Examples:
-                wp_enqueue_script('jquery');
-        //        wp_enqueue_style('my-style', plugins_url('/css/my-style.css', __FILE__));
-                //wp_enqueue_script('chaeschtlizettel-script', plugins_url('/js/chaeschtlizettel.js', __FILE__));
-                wp_enqueue_style('chaeschtlizettel-style', plugins_url('/css/chaeschtlizettel.css', __FILE__));
-                wp_enqueue_style('clockpicker-style', plugins_url('/css/clockpicker.css', __FILE__));
-                wp_enqueue_style('standalone-style', plugins_url('/css/standalone.css', __FILE__));
-                wp_enqueue_style('datepicker-style', plugins_url('/css/datepicker.css', __FILE__));
+        wp_enqueue_script('jquery');
+        // wp_enqueue_style('my-style', plugins_url('/css/my-style.css', __FILE__));
+        //wp_enqueue_script('chaeschtlizettel-script', plugins_url('/js/chaeschtlizettel.js', __FILE__));
+        wp_enqueue_style('chaeschtlizettel-style', plugins_url('/css/chaeschtlizettel.css', __FILE__));
+        wp_enqueue_style('clockpicker-style', plugins_url('/css/clockpicker.css', __FILE__));
+        wp_enqueue_style('standalone-style', plugins_url('/css/standalone.css', __FILE__));
+        wp_enqueue_style('datepicker-style', plugins_url('/css/datepicker.css', __FILE__));
 
-        function my_enqueue($hook) {
-            if( 'index.php' != $hook ) {
-          	     // Only applies to dashboard panel
-          	     return;
-            }
-
-          	wp_enqueue_script( 'clockpicker-script', plugins_url( '/js/clockpicker.js', __FILE__ ), array('jquery') );
-            wp_enqueue_script( 'datepicker-script', plugins_url( '/js/datepicker.js', __FILE__ ), array('jquery') );
-            wp_enqueue_script( 'chaeschtlizettel-script', plugins_url( '/js/chaeschtlizettel.js', __FILE__ ), array('jquery') );
-
-          	// in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
-        	  wp_localize_script( 'chaeschtlizettel-script', 'ajax_object',
-                    array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1234 ) );
+        if (strpos($_SERVER['REQUEST_URI'], $this->getSettingsSlug()) !== false) {
+          wp_enqueue_style('jquery-ui', plugins_url('/css/jquery-ui.css', __FILE__));
+          wp_enqueue_script('jquery-ui-core');
+          wp_enqueue_script('jquery-ui-tabs');
+          // enqueue any othere scripts/styles you need to use
         }
 
+        function my_enqueue($hook) {
+          if( 'index.php' != $hook ) {
+            // Only applies to dashboard panel
+            return;
+          }
+
+          wp_enqueue_script( 'clockpicker-script', plugins_url( '/js/clockpicker.js', __FILE__ ), array('jquery') );
+          wp_enqueue_script( 'datepicker-script', plugins_url( '/js/datepicker.js', __FILE__ ), array('jquery') );
+          wp_enqueue_script( 'chaeschtlizettel-script', plugins_url( '/js/chaeschtlizettel.js', __FILE__ ), array('jquery') );
+          // in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
+          wp_localize_script( 'chaeschtlizettel-script', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1234 ) );
+        }
 
         // Register short codes
         // http://plugin.michael-simpson.com/?page_id=39
@@ -368,5 +375,40 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
     }
 
+    public function settingsPage() {
+      if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.', 'TEXT-DOMAIN'));
+      }
+    ?>
+    <div>
+      <h1>Chaeschtlizettel Settings</h1>
+    </div>
 
+    <script type="text/javascript">
+      jQuery(function() {
+        jQuery("#plugin_config_tabs").tabs();
+      });
+    </script>
+
+    <div class="plugin_config">
+      <div id="plugin_config_tabs">
+        <ul>
+          <li><a href="#plugin_config-1">Stufen</a></li>
+          <li><a href="#plugin_config-2">Options</a></li>
+        </ul>
+        <div id="plugin_config-1">
+          <?php $this->outputTabStufenContents(); ?>
+        </div>
+        <div id="plugin_config-2">
+          <?php parent::settingsPage(); ?>
+        </div>
+      </div>
+    </div>
+    <?php
+    }
+
+    public function outputTabStufenContents(){
+      echo ("Stufen Tab sample content");
+    }
 }
+?>

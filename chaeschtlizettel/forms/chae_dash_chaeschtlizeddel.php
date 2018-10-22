@@ -1,4 +1,4 @@
-/*
+<!--
     "Chaeschtlizettel Plugin" Copyright (C) 2018 Matthias Kunz v/o Funke  (email : funke.uster@cevi.ch)
     "Chaeschtlizettel Plugin" is derived from "WordPress Plugin Template" Copyright (C) 2018 Michael Simpson  (email : michael.d.simpson@gmail.com)
 
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with Contact Form to Database Extension.
     If not, see http://www.gnu.org/licenses/gpl-3.0.html
-*/
+*/-->
 <form action="" method="post" id="chae-dash-form" class="initial-form hide-if-no-js">
 
 
