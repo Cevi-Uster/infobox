@@ -1,0 +1,23 @@
+{
+ 2   "definitions": {},
+ 3   "$schema": "",
+ 4   "$id": "https://github.com/Cevi-Uster/infobox/tree/master/chaeschtlizettel/JSON_Schema_delete_stufen.json",
+ 5   "type": "object",
+ 6   "title": "Update Stufe Schema",
+ 7   "default": null,
+ 8   "required": [
+ 9     "stufen_id",
+10     "name"
+11   ],
+12   "properties": {
+13     "stufen_id": {
+14       "$id": "#/properties/stufen_id",
+15       "type": "integer",
+16       "title": "StufenID",
+17       "default": "",
+18       "examples": [
+19         "5"
+20       ]
+21     }
+32   }
+33 }

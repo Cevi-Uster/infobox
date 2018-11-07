@@ -35,7 +35,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       array(
           'methods' => WP_REST_Server::READABLE,
           'callback'  => array( $this, 'get_stufen' ),
-          'permission_callback'   => array( $this, 'get_stufen_permission' )
+          'permission_callback' => array( $this, 'get_stufen_permission' )
       )
     ));
 
@@ -44,7 +44,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'update_stufe' ),
           'permission_callback' => array( $this, 'update_stufe_permission' )
-      )
+      ),
+      'schema' => array( $this,'get_update_stufen_schema')
     ));
 
     register_rest_route( $namespace, '/' . $base."/insert/", array(
@@ -91,7 +92,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       return true;
   }
  
-  public function get_stufen( WP_REST_Request $request ){
+  public function get_stufen(WP_REST_Request $request){
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
     $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
@@ -101,11 +102,15 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     return $result;
   }
 
+  public function get_update_stufen_schema(){
+    return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_update_stufen.json');
+  }
+
   public function update_stufe_permission(){
       return true;//current_user_can('administrator');
   }
 
-  public function update_stufe( WP_REST_Request $request ){
+  public function update_stufe(WP_REST_Request $request){
     $json_request = json_decode($request->get_body(), true);
 
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
