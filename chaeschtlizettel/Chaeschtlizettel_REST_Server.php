@@ -53,7 +53,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'insert_stufe' ),
           'permission_callback' => array( $this, 'insert_stufe_permission' )
-      )
+      ),
+      'schema' => array( $this,'get_insert_stufen_schema')
     ));
 
     register_rest_route( $namespace, '/' . $base."/delete/", array(
@@ -61,7 +62,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'delete_stufe' ),
           'permission_callback' => array( $this, 'delete_stufe_permission' )
-      )
+      ),
+      'schema' => array( $this,'get_delete_stufen_schema')
     ));
 
     register_rest_route( $namespace, '/chaeschtlizettel/(?P<id>\d+)', array(
@@ -124,6 +126,10 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     return 'bad request';
   }
 
+  public function get_insert_stufen_schema(){
+    return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_insert_stufen.json');
+  }
+
   public function insert_stufe_permission(){
       return true;//current_user_can('administrator');
   }
@@ -140,6 +146,11 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       return $wpdb->insert($table_name, array('name' => $json_request['name'], 'erstellt' => current_time( 'mysql' )), array('%s', '%s'));
     }
     return 'bad request';
+  }
+
+
+  public function get_delete_stufen_schema(){
+    return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_delete_stufen.json');
   }
 
   public function delete_stufe_permission(){
