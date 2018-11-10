@@ -338,8 +338,14 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
         if (strpos($_SERVER['REQUEST_URI'], $this->getSettingsSlug()) !== false) {
           wp_enqueue_style('jquery-ui', plugins_url('/css/jquery-ui.css', __FILE__));
+          wp_enqueue_style('table-style', plugins_url('/css/table.css', __FILE__));
+          wp_enqueue_style('font-awesome-style', plugins_url('/css/font-awesome.min.css', __FILE__));
+          wp_enqueue_style('prettify-bootstrap-style', plugins_url('/css/prettify-bootstrap.min.css', __FILE__));
+          wp_enqueue_style('prettify-style', plugins_url('/css/prettify.min.css', __FILE__));
+          wp_enqueue_style('bootstrap-yeti-style', plugins_url('/css/bootstrap-yeti.min.css', __FILE__));
           wp_enqueue_script('jquery-ui-core');
           wp_enqueue_script('jquery-ui-tabs');
+          wp_enqueue_script( 'clockpicker-script', plugins_url( '/js/jquery.tabledit.min.js', __FILE__ ), array('jquery') );
           // enqueue any othere scripts/styles you need to use
         }
 
@@ -408,7 +414,35 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     }
 
     public function outputTabStufenContents(){
-      echo ("Stufen Tab sample content");
+      global $wpdb;
+      $tableName = $this->prefixTableName('stufen');
+      $sql = "SELECT stufen_id, name FROM $tableName";
+      $stufen = $wpdb->get_results($sql);
+      echo('<table id="stufentable" class="table table-striped table-bordered">');
+      echo('<thead>');
+      echo('<th>stufen_id</th><th>name</th>');
+      echo('</thead>');
+      echo('<tbody>');
+      foreach ($stufen as &$stufe) {
+        echo('<tr>');
+        echo('<td>'.$stufe->stufen_id.'</td><td>'.$stufe->name.'</td>');
+        echo('</tr>');
+      }
+      echo('</tbody>');
+      echo('</table>');
+      ?>
+      <script type="text/javascript">
+        jQuery(document).ready(function($) {
+          $('#stufentable').Tabledit({
+          url: 'wp-json/chaeschtlizettel/v1/stufen',
+          columns: {
+            identifier: [0, 'stufen_id'],
+            editable: [[1, 'name']]
+          }
+          });
+        });
+      </script>
+      <?php
     }
 }
 ?>
