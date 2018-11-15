@@ -434,7 +434,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       <script type="text/javascript">
         jQuery(document).ready(function($) {
           $('#stufentable').Tabledit({
-          url: 'wp-json/chaeschtlizettel/v1/stufen',
+          url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
+          restoreButton: false,
           columns: {
             identifier: [0, 'stufen_id'],
             editable: [[1, 'name']]

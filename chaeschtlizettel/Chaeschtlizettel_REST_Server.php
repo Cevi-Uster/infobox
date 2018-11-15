@@ -39,6 +39,16 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       )
     ));
 
+    $namespace = $this->my_namespace . $this->my_version;
+    $base      = 'stufen';
+    register_rest_route( $namespace, '/' . $base, array(
+      array(
+          'methods' => WP_REST_Server::EDITABLE,
+          'callback'  => array( $this, 'update_or_delete_stufen' ),
+          'permission_callback' => array( $this, 'update_or_delete_stufen_permission' )
+      )
+    ));
+
     register_rest_route( $namespace, '/' . $base."/update/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
@@ -103,6 +113,31 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $result = $wpdb->get_results($sql_stmt, OBJECT);
     return $result;
   }
+
+  public function update_or_delete_stufen_permission(){
+      return true;//current_user_can('administrator');
+  }
+ 
+  public function update_or_delete_stufen(WP_REST_Request $request){
+    //$json_request = json_decode($request->get_params(), true);
+    $action = $request->get_params()['action'];
+    $stufen_id = $request->get_params()['stufen_id'];
+    $name = $request->get_params()['name'];
+    $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
+    global $wpdb;
+    $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
+    if ($action === 'edit' && isset($stufen_id) && isset($name)){
+      $wpdb->show_errors(); 
+      return $wpdb->update($table_name, array('name' => $name), array('stufen_id' => $stufen_id), array('%s'), array('%d'));
+    } else if ($action === 'delete' && isset($stufen_id)){
+      $wpdb->show_errors(); 
+      return $wpdb->delete($table_name,  array('stufen_id' => $stufen_id), array('%d'));
+    }
+    //return 'bad request';
+    return $json_request;
+  }
+
+
 
   public function get_update_stufen_schema(){
     return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_update_stufen.json');
