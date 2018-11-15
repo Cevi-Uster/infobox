@@ -431,8 +431,18 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       echo('</tbody>');
       echo('</table>');
       ?>
+      <br>
+      <form id="newStufeForm">
+        Neue Stufe:&nbsp;<input type="text" name="name" value="">&nbsp;<input type="submit" value="Hinzuf&uuml;gen">
+      </form> 
       <script type="text/javascript">
         jQuery(document).ready(function($) {
+          
+          document.getElementById("newStufeForm").addEventListener("click", function(event){
+              event.preventDefault();
+              addNewStufe();
+          });
+
           $('#stufentable').Tabledit({
           url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
           restoreButton: false,
@@ -441,6 +451,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             editable: [[1, 'name']]
           }
           });
+
+          function addNewStufe(){
+            var frm = $('#newStufeForm');
+            var dat = JSON.stringify(frm.serializeArray());
+          alert("I am about to POST this:\n\n" + dat);
+        }
         });
       </script>
       <?php
