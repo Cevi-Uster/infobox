@@ -464,16 +464,16 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     public function outputTabStufenContents(){
       global $wpdb;
       $tableName = $this->prefixTableName('stufen');
-      $sql = "SELECT stufen_id, name FROM $tableName";
+      $sql = "SELECT stufen_id, name, abteilung, jahrgang FROM $tableName";
       $stufen = $wpdb->get_results($sql);
       echo('<table id="stufentable" class="table table-striped table-bordered">');
       echo('<thead>');
-      echo('<th>stufen_id</th><th>name</th>');
+      echo('<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>');
       echo('</thead>');
       echo('<tbody>');
       foreach ($stufen as &$stufe) {
         echo('<tr>');
-        echo('<td>'.$stufe->stufen_id.'</td><td>'.$stufe->name.'</td>');
+        echo('<td>'.$stufe->stufen_id.'</td><td>'.$stufe->name.'</td><td>'.$stufe->abteilung.'</td><td>'.$stufe->jahrgang.'</td>');
         echo('</tr>');
       }
       echo('</tbody>');
@@ -492,11 +492,11 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           });
 
           $('#stufentable').Tabledit({
-          url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
+          url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/update',
           restoreButton: false,
           columns: {
             identifier: [0, 'stufen_id'],
-            editable: [[1, 'name']]
+            editable: [[1, 'name'], [2, 'abteilung', '{"m": "Knaben", "f": "Mädchen"}'], [3, 'jahrgang']]
           }
           });
 
