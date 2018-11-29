@@ -86,6 +86,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             stufen_id INTEGER(16) NOT NULL AUTO_INCREMENT,
             erstellt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             name VARCHAR(100),
+            abteilung VARCHAR(30),
+            jahrgang NUMBER
             PRIMARY KEY  (stufen_id)
         )$charset_collate;");
 
@@ -137,6 +139,52 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
      * @return void
      */
     public function upgrade() {
+        global $wpdb;
+        $wpdb->show_errors();
+        $upgradeOk = true;
+        $savedVersion = $this->getVersionSaved();
+      
+        if ($this->isVersionLessThan($savedVersion, '0.3')) {
+        
+
+          $tableName = $this->prefixTableName('stufen');
+          if (!$this->tableColumnExists($tableName, "abteilung")){
+            $upgradeOk  = $upgradeOk && $wpdb->query("ALTER TABLE $tableName ADD COLUMN abteilung VARCHAR(30)");
+          }
+
+          if (!$this->tableColumnExists($tableName, "jahrgang")){
+            $upgradeOk  = $upgradeOk && $wpdb->query("ALTER TABLE $tableName ADD COLUMN jahrgang INTEGER");
+          }
+        }
+           
+     
+        // Post-upgrade, set the current version in the options
+        $codeVersion = $this->getVersion();
+        if ($upgradeOk && $savedVersion != $codeVersion) {
+            $this->saveInstalledVersion();
+        }
+        
+    }
+
+    /**
+     * Returns true if a database table column exists. Otherwise returns false.
+     *
+     * @link http://stackoverflow.com/a/5943905/2489248
+     * @global wpdb $wpdb
+     *
+     * @param string $table_name Name of table we will check for column existence.
+     * @param string $column_name Name of column we are checking for.
+     *
+     * @return boolean True if column exists. Else returns false.
+     */
+    function tableColumnExists( $table_name, $column_name ) {
+      global $wpdb;
+      $column = $wpdb->get_results( $wpdb->prepare("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s ",
+        DB_NAME, $table_name, $column_name) );
+      if ( ! empty( $column ) ) {
+        return true;
+      }
+      return false;
     }
 
     public function showChaeschtli($atts){
@@ -455,7 +503,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           function addNewStufe(){
             var frm = $('#newStufeForm');
             var dat = JSON.stringify(frm.serializeArray());
-          alert("I am about to POST this:\n\n" + dat);
+            
+            alert("I am about to POST this:\n\n" + dat);
         }
         });
       </script>
