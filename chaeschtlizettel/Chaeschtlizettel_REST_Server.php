@@ -108,7 +108,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
     $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
-    $sql_stmt = "SELECT stufen_id, name FROM $table_name";
+    $sql_stmt = "SELECT stufen_id, name, abteilung, jahrgang FROM $table_name";
     //$sql = $wpdb->prepare($sql_stmt);
     $result = $wpdb->get_results($sql_stmt, OBJECT);
     return $result;
@@ -156,7 +156,10 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     if (isset($json_request['stufen_id']) && isset($json_request['name'])) {
       $wpdb->show_errors(); 
-      return $wpdb->update($table_name, array('name' => $json_request['name']), array('stufen_id' => $json_request['stufen_id']), array('%s'), array('%d'));
+      return $wpdb->update($table_name, array('name' => $json_request['name'], 
+          'abteilung' => $json_request['abteilung'], 
+          'jahrgang' => $json_request['jahrgang']), 
+        array('stufen_id' => $json_request['stufen_id']), array('%s'), array('%d'));
     }
     return 'bad request';
   }
@@ -178,7 +181,11 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     if (isset($json_request['name'])) {
       $wpdb->show_errors(); 
-      return $wpdb->insert($table_name, array('name' => $json_request['name'], 'erstellt' => current_time( 'mysql' )), array('%s', '%s'));
+      return $wpdb->insert($table_name, array('name' => $json_request['name'], 
+          'erstellt' => current_time( 'mysql' ), 
+          'abteilung' => $json_request['abteilung'], 
+          'jahrgang' => $json_request['jahrgang']), 
+        array('%s', '%s'));
     }
     return 'bad request';
   }

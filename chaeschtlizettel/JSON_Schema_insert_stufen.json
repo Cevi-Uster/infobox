@@ -1,24 +1,43 @@
 {
- 2   "definitions": {},
- 3   "$schema": "",
- 4   "$id": "https://github.com/Cevi-Uster/infobox/tree/master/chaeschtlizettel/JSON_Schema_insert_stufen.json",
- 5   "type": "object",
- 6   "title": "Update Stufe Schema",
- 7   "default": null,
- 8   "required": [
- 9     "stufen_id",
-10     "name"
-11   ],
-12   "properties": {
-22     "name": {
-23       "$id": "#/properties/name",
-24       "type": "string",
-25       "title": "Stufenname",
-26       "default": "",
-27       "examples": [
-28         "Jabalaya"
-29       ],
-30       "pattern": "^(.*)$"
-31     }
-32   }
-33 }
+   "definitions": {},
+   "$schema": "",
+   "$id": "https://github.com/Cevi-Uster/infobox/tree/master/chaeschtlizettel/JSON_Schema_insert_stufen.json",
+   "type": "object",
+   "title": "Update Stufe Schema",
+   "default": null,
+   "required": [
+     "stufen_id",
+     "name"
+   ],
+   "properties": {
+     "name": {
+       "$id": "#/properties/name",
+       "type": "string",
+       "title": "Stufenname",
+       "default": "",
+       "examples": [
+         "Jabalaya"
+       ],
+       "pattern": "^(.*)$"
+     }
+   },
+   "abteilung": {
+       "$id": "#/properties/abteilung",
+       "type": "string",
+       "title": "Abteilung",
+       "default": "",
+       "examples": [
+         "m", "f"
+       ],
+       "pattern": "^(.*)$"
+    },
+    "jahrgang": {
+       "$id": "#/properties/jahrgang",
+       "type": "integer",
+       "title": "Jahrgang",
+       "default": "",
+       "examples": [
+         "2011"
+       ]
+     }
+}
