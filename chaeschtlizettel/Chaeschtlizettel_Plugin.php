@@ -377,6 +377,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // Adding scripts & styles to all pages
         // Examples:
         wp_enqueue_script('jquery');
+        wp_enqueue_script( 'jquery-serializejson-js', plugins_url( '/js/jquery.serializejson.min.js', __FILE__ ), array('jquery') );
         // wp_enqueue_style('my-style', plugins_url('/css/my-style.css', __FILE__));
         //wp_enqueue_script('chaeschtlizettel-script', plugins_url('/js/chaeschtlizettel.js', __FILE__));
         wp_enqueue_style('chaeschtlizettel-style', plugins_url('/css/chaeschtlizettel.css', __FILE__));
@@ -393,7 +394,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           wp_enqueue_style('bootstrap-yeti-style', plugins_url('/css/bootstrap-yeti.min.css', __FILE__));
           wp_enqueue_script('jquery-ui-core');
           wp_enqueue_script('jquery-ui-tabs');
-          wp_enqueue_script( 'clockpicker-script', plugins_url( '/js/jquery.tabledit.min.js', __FILE__ ), array('jquery') );
+          wp_enqueue_script( 'clockpicker-script', plugins_url( '/js/jquery.tabledit.js', __FILE__ ), array('jquery') );
           // enqueue any othere scripts/styles you need to use
         }
 
@@ -492,7 +493,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           });
 
           $('#stufentable').Tabledit({
-          url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/update',
+          url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
           restoreButton: false,
           columns: {
             identifier: [0, 'stufen_id'],

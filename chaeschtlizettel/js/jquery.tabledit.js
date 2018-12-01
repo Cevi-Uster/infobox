@@ -44,7 +44,7 @@ if (typeof jQuery === 'undefined') {
                 edit: {
                     class: 'btn btn-sm btn-default',
                     html: '<span class="glyphicon glyphicon-pencil"></span>',
-                    action: 'edit'
+                    action: 'update'
                 },
                 delete: {
                     class: 'btn btn-sm btn-default',
@@ -369,7 +369,7 @@ if (typeof jQuery === 'undefined') {
          */
         function ajax(action)
         {
-            var serialize = $table.find('.tabledit-input').serialize() + '&action=' + action;
+            var serialize = JSON.stringify($table.find('.tabledit-input').serializeJSON()); // + '&action=' + action;
 
             var result = settings.onAjax(action, serialize);
 
@@ -377,7 +377,7 @@ if (typeof jQuery === 'undefined') {
                 return false;
             }
 
-            var jqXHR = $.post(settings.url, serialize, function(data, textStatus, jqXHR) {
+            var jqXHR = $.post(settings.url + "/" + action, serialize, function(data, textStatus, jqXHR) {
                 if (action === settings.buttons.edit.action) {
                     $lastEditedRow.removeClass(settings.dangerClass).addClass(settings.warningClass);
                     setTimeout(function() {
