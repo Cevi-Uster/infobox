@@ -482,7 +482,16 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       ?>
       <br>
       <form id="newStufeForm">
-        Neue Stufe:&nbsp;<input type="text" name="name" value="">&nbsp;<input type="submit" value="Hinzuf&uuml;gen">
+        Neue Stufe:<br/>
+        Name:&nbsp;<input type="text" name="name" value=""><br/>
+        Abteilung:&nbsp; 
+          <select name="abteilung">
+            <option value="m">Knaben</option>
+            <option value="f">M&auml;dchen</option>
+          </select> 
+        <br/>
+        Jahrgang:&nbsp;<input type="text" name="jahrgang" value=""><br/>
+        <input type="submit" value="Hinzuf&uuml;gen">
       </form> 
       <script type="text/javascript">
         jQuery(document).ready(function($) {
@@ -502,8 +511,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           });
 
           function addNewStufe(){
-            var frm = $('#newStufeForm');
-            var dat = JSON.stringify(frm.serializeArray());
+            //var frm = $('#newStufeForm');
+            var dat = JSON.stringify($('#newStufeForm').serializeJSON()); 
             
             alert("I am about to POST this:\n\n" + dat);
         }
