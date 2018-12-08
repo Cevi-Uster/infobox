@@ -523,6 +523,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             var data = JSON.stringify($('#newStufeForm').serializeJSON()); 
             
             $.post('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/insert', data, function(data, response) {
+              $("#newStufeForm")[0].reset();
               loadStufenTable();
             });
           }
