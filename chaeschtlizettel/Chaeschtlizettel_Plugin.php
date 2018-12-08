@@ -463,59 +463,71 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     }
 
     public function outputTabStufenContents(){
-      global $wpdb;
-      $tableName = $this->prefixTableName('stufen');
-      $sql = "SELECT stufen_id, name, abteilung, jahrgang FROM $tableName";
-      $stufen = $wpdb->get_results($sql);
-      echo('<table id="stufentable" class="table table-striped table-bordered">');
-      echo('<thead>');
-      echo('<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>');
-      echo('</thead>');
-      echo('<tbody>');
-      foreach ($stufen as &$stufe) {
-        echo('<tr>');
-        echo('<td>'.$stufe->stufen_id.'</td><td>'.$stufe->name.'</td><td>'.$stufe->abteilung.'</td><td>'.$stufe->jahrgang.'</td>');
-        echo('</tr>');
-      }
-      echo('</tbody>');
-      echo('</table>');
       ?>
-      <br>
+      <div id="errorMessageContainer"></div>
+      <div id="stufeTableContainer"></div>
+      <br/>
+      Neue Stufe:<br/>
       <form id="newStufeForm">
-        Neue Stufe:<br/>
-        Name:&nbsp;<input type="text" name="name" value=""><br/>
-        Abteilung:&nbsp; 
-          <select name="abteilung">
-            <option value="m">Knaben</option>
-            <option value="f">M&auml;dchen</option>
-          </select> 
-        <br/>
-        Jahrgang:&nbsp;<input type="text" name="jahrgang" value=""><br/>
-        <input type="submit" value="Hinzuf&uuml;gen">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" name="name" class="form-control input-sm" value="">
+          <label for="abteilung">Abteilung:</label>
+            <select name="abteilung" class="form-control input-sm">
+              <option value="m">Knaben</option>
+              <option value="f">M&auml;dchen</option>
+            </select> 
+          <label for="jahrgang">Jahrgang:</label>
+          <input type="text" class="form-control input-sm" name="jahrgang" value=""><br/>
+          <input type="submit" id="newStufeFormSubmitButton" value="Hinzuf&uuml;gen">
+        </div>
       </form> 
       <script type="text/javascript">
         jQuery(document).ready(function($) {
+
+            function loadStufenTable(){
+            $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen', {}, function(data, response) {
+              var html = '<table id="stufenTable" class="table table-striped table-bordered">';
+              html += '<thead>';
+              html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
+              html += '</thead>';
+              html += '<tbody>';
+              html += data.reduce(function(string, item) {
+                return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name  + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang +  "</td></tr>"
+              }, '');
+              html += '</tbody>';
+              html += '</table>';
+              $('div#stufeTableContainer').html(html);
+              makeTableEditable();
+            });
+          }
+
+          function makeTableEditable(){
+            $('#stufenTable').Tabledit({
+            url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
+            restoreButton: false,
+            columns: {
+              identifier: [0, 'stufen_id'],
+              editable: [[1, 'name'], [2, 'abteilung', '{"m": "Knaben", "f": "Mädchen"}'], [3, 'jahrgang']]
+            }
+            });
+          }
           
-          document.getElementById("newStufeForm").addEventListener("click", function(event){
+          document.getElementById("newStufeFormSubmitButton").addEventListener("click", function(event){
               event.preventDefault();
               addNewStufe();
           });
-
-          $('#stufentable').Tabledit({
-          url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
-          restoreButton: false,
-          columns: {
-            identifier: [0, 'stufen_id'],
-            editable: [[1, 'name'], [2, 'abteilung', '{"m": "Knaben", "f": "Mädchen"}'], [3, 'jahrgang']]
-          }
-          });
-
+          
           function addNewStufe(){
             //var frm = $('#newStufeForm');
-            var dat = JSON.stringify($('#newStufeForm').serializeJSON()); 
+            var data = JSON.stringify($('#newStufeForm').serializeJSON()); 
             
-            alert("I am about to POST this:\n\n" + dat);
-        }
+            $.post('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/insert', data, function(data, response) {
+              loadStufenTable();
+            });
+          }
+
+          loadStufenTable();
         });
       </script>
       <?php
