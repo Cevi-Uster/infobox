@@ -72,7 +72,8 @@ if (typeof jQuery === 'undefined') {
             onSuccess: function() { return; },
             onFail: function() { return; },
             onAlways: function() { return; },
-            onAjax: function() { return; }
+            onAjax: function() { return; },
+            deleteCallbackFunction: function() { return; }
         };
 
         var settings = $.extend(true, defaults, options);
@@ -322,15 +323,7 @@ if (typeof jQuery === 'undefined') {
                 if (ajaxResult === false) {
                     return;
                 }
-
-                // Add class "deleted" to row.
-                $(td).parent('tr').addClass('tabledit-deleted-row');
-                // Hide table row.
-                $(td).parent('tr').addClass(settings.mutedClass).find('.tabledit-toolbar button:not(.tabledit-restore-button)').attr('disabled', true);
-                // Show restore button.
-                $(td).find('.tabledit-restore-button').show();
-                // Set last deleted row.
-                $lastDeletedRow = $(td).parent('tr');
+                settings.deleteCallbackFunction();
             },
             confirm: function(td) {
                 // Reset all cells in edit mode.

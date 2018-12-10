@@ -506,6 +506,9 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             $('#stufenTable').Tabledit({
             url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
             restoreButton: false,
+            deleteCallbackFunction: function() {
+                loadStufenTable();
+            },
             columns: {
               identifier: [0, 'stufen_id'],
               editable: [[1, 'name'], [2, 'abteilung', '{"m": "Knaben", "f": "Mädchen"}'], [3, 'jahrgang']]
