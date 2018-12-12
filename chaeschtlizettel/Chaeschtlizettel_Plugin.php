@@ -87,7 +87,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             erstellt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             name VARCHAR(100),
             abteilung VARCHAR(30),
-            jahrgang NUMBER
+            jahrgang INTEGER
             PRIMARY KEY  (stufen_id)
         )$charset_collate;");
 
