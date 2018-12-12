@@ -88,7 +88,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             name VARCHAR(100),
             abteilung VARCHAR(30),
             jahrgang INTEGER,
-            PRIMARY KEY  (stufen_id)
+            PRIMARY KEY (stufen_id)
         )$charset_collate;");
 
         $tableName = $this->prefixTableName('match_user_stufen');
@@ -110,7 +110,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             bis datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             wo VARCHAR(100) NOT NULL,
             infos text,
-            PRIMARY KEY  (stufen_id)
+            PRIMARY KEY (stufen_id)
         )$charset_collate;");
 
     }
@@ -188,43 +188,49 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     }
 
     public function showChaeschtli($atts){
-      global $wpdb;
+      try {
+        global $wpdb;
 
-      // stufen id suchen
-      $tableName = $this->prefixTableName('stufen');
-      $sql_stmt = "SELECT stufen_id FROM $tableName WHERE name = %s";
-      $sql = $wpdb->prepare($sql_stmt,
-                            $atts['stufe']
-                            );
+        // stufen id suchen
+        $tableName = $this->prefixTableName('stufen');
+        $sql_stmt = "SELECT stufen_id FROM $tableName WHERE name = %s";
+        $sql = $wpdb->prepare($sql_stmt,
+                              $atts['stufe']
+                              );
 
-      $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
+        $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
 
-      $tableName = $this->prefixTableName('chaeschtlizettel');
-      $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
-      $sql = $wpdb->prepare($sql_stmt,
-                            $stufenId
-                            );
-      //echo $sql;
+        $tableName = $this->prefixTableName('chaeschtlizettel');
+        $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
+        $sql = $wpdb->prepare($sql_stmt,
+                              $stufenId
+                              );
+        //echo $sql;
 
-      $result = $wpdb->get_results($sql);
-      //var_dump($result);
-      $chaeschtli = $result[0];
+        $result = $wpdb->get_results($sql);
+        //var_dump($result);
+        $chaeschtli = $result[0];
 
-      // datum formatieren
-      $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
-      $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
+        // datum formatieren
+        $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
+        $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
 
-      if($von->format('Y-m-d') == $bis->format('Y-m-d')){
-        $zeit = $von->format('j.m.Y H:i').' - '.$bis->format('H:i');
-      }else{
-        $zeit = $von->format('j.m.Y H:i').' - '.$bis->format('j.m.Y H:i');
-      }
+        if($von != NULL || $bis != NULL){
+          if($von->format('Y-m-d') == $bis->format('Y-m-d')){
+            $zeit = $von->format('j.m.Y H:i').' - '.$bis->format('H:i');
+          }else{
+            $zeit = $von->format('j.m.Y H:i').' - '.$bis->format('j.m.Y H:i');
+          }
 
-      $now = date('Y-m-d');
-      if($von->format('Y-m-d') < $now){
-        return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><p>Keine aktuellen Informationen verfügbar.</p></div>';
-      }else{
-        return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><h6>Treffpunkt</h6><p>'.$zeit.'<br>'.$chaeschtli->wo.'</p><h6>Mitnehmen</h6><p>'.$chaeschtli->infos.'</p></div>';
+          $now = date('Y-m-d');
+          if($von->format('Y-m-d') < $now){
+            return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><p>Keine aktuellen Informationen verfügbar.</p></div>';
+          }else{
+            return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><h6>Treffpunkt</h6><p>'.$zeit.'<br>'.$chaeschtli->wo.'</p><h6>Mitnehmen</h6><p>'.$chaeschtli->infos.'</p></div>';
+          }
+        }
+      } catch (Exception $e) {
+        echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
       }
     }
 
@@ -232,46 +238,53 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
      * Create the function to output the contents of our Dashboard Widget.
      */
     public function example_dashboard_widget_function() {
-      // Display dashboard widget content
-      $user = get_current_user_id();
+      try{
+        // Display dashboard widget content
+        $user = get_current_user_id();
 
-      global $wpdb;
+        global $wpdb;
 
-      // stufen id suchen
-      $tableName = $this->prefixTableName('match_user_stufen');
-      $sql_stmt = "SELECT stufen_id FROM $tableName WHERE user_id = %s";
-      $sql = $wpdb->prepare($sql_stmt,
-                            $user
-                            );
+        // stufen id suchen
+        $tableName = $this->prefixTableName('match_user_stufen');
+        $sql_stmt = "SELECT stufen_id FROM $tableName WHERE user_id = %s";
+        $sql = $wpdb->prepare($sql_stmt,
+                              $user
+                              );
 
-      $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
+        $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
 
-      $tableName = $this->prefixTableName('chaeschtlizettel');
-      $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
-      $sql = $wpdb->prepare($sql_stmt,
-                            $stufenId
-                            );
-      //echo $sql;
+        $tableName = $this->prefixTableName('chaeschtlizettel');
+        $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
+        $sql = $wpdb->prepare($sql_stmt,
+                              $stufenId
+                              );
+        //echo $sql;
 
-      $result = $wpdb->get_results($sql);
-      $chaeschtli = $result[0];
+        $result = $wpdb->get_results($sql);
+        $chaeschtli = $result[0];
 
-      $last_update = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->geaendert)->format('j.m.Y H:i');
-      //var_dump($chaeschtli);
+        if($chaeschtli != NULL){
+          $last_update = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->geaendert)->format('j.m.Y H:i');
+        }//var_dump($chaeschtli);
 
-      // datum formatieren
-      $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
-      $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
+        // datum formatieren
+        $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
+        $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
 
-      $now = date('Y-m-d');
-      if($von->format('Y-m-d') < $now){
-        $status = "abgelaufen";
-        $chaeschtli->infos = "";
-        $chaeschtli->wo = "";
-        $von = DateTime::createFromFormat('H:i', '14:00');
-        $bis = DateTime::createFromFormat('H:i', '17:00');
-      }else{
-        $status = "noch gültig";
+        $now = date('Y-m-d');
+        if($von != NULL || $bis != NULL){
+          if($von->format('Y-m-d') < $now){
+            $status = "abgelaufen";
+            $chaeschtli->infos = "";
+            $chaeschtli->wo = "";
+            $von = DateTime::createFromFormat('H:i', '14:00');
+            $bis = DateTime::createFromFormat('H:i', '17:00');
+          }else{
+            $status = "noch gültig";
+          }
+        }
+      }catch (Exception $e) {
+        echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
       }
 
       include("forms/chae_dash_chaeschtlizeddel.php");
