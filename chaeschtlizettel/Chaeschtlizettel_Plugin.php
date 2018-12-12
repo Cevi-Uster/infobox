@@ -87,7 +87,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             erstellt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             name VARCHAR(100),
             abteilung VARCHAR(30),
-            jahrgang INTEGER
+            jahrgang INTEGER,
             PRIMARY KEY  (stufen_id)
         )$charset_collate;");
 
@@ -143,9 +143,9 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         $wpdb->show_errors();
         $upgradeOk = true;
         $savedVersion = $this->getVersionSaved();
-      
+
         if ($this->isVersionLessThan($savedVersion, '0.3')) {
-        
+
 
           $tableName = $this->prefixTableName('stufen');
           if (!$this->tableColumnExists($tableName, "abteilung")){
@@ -156,14 +156,14 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             $upgradeOk  = $upgradeOk && $wpdb->query("ALTER TABLE $tableName ADD COLUMN jahrgang INTEGER");
           }
         }
-           
-     
+
+
         // Post-upgrade, set the current version in the options
         $codeVersion = $this->getVersion();
         if ($upgradeOk && $savedVersion != $codeVersion) {
             $this->saveInstalledVersion();
         }
-        
+
     }
 
     /**
@@ -476,12 +476,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             <select name="abteilung" class="form-control input-sm">
               <option value="m">Knaben</option>
               <option value="f">M&auml;dchen</option>
-            </select> 
+            </select>
           <label for="jahrgang">Jahrgang:</label>
           <input type="text" class="form-control input-sm" name="jahrgang" value=""><br/>
           <input type="submit" id="newStufeFormSubmitButton" value="Hinzuf&uuml;gen">
         </div>
-      </form> 
+      </form>
       <script type="text/javascript">
         jQuery(document).ready(function($) {
 
@@ -515,16 +515,16 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             }
             });
           }
-          
+
           document.getElementById("newStufeFormSubmitButton").addEventListener("click", function(event){
               event.preventDefault();
               addNewStufe();
           });
-          
+
           function addNewStufe(){
             //var frm = $('#newStufeForm');
-            var data = JSON.stringify($('#newStufeForm').serializeJSON()); 
-            
+            var data = JSON.stringify($('#newStufeForm').serializeJSON());
+
             $.post('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/insert', data, function(data, response) {
               $("#newStufeForm")[0].reset();
               loadStufenTable();
