@@ -12,7 +12,7 @@
 
     WordPress Plugin Template is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PUR/E.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
@@ -21,12 +21,18 @@
 */
 require_once('Chaeschtlizettel_Plugin.php');
 
+// Avoid the removal of the 'X-WP-Nonce' authentication header (see: https://github.com/WP-API/WP-API/issues/2538)
+add_filter( 'rest_pre_dispatch', 'prefix_return_current_user' );
+function prefix_return_current_user( $result ) {
+  $user_id = get_current_user_id();
+  $user = wp_set_current_user($user_id );
+}
+
 class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
  
   //The namespace and version for the REST SERVER
   var $my_namespace = 'chaeschtlizettel/v';
   var $my_version   = '1';
-
  
   public function register_routes() {
     $namespace = $this->my_namespace . $this->my_version;
@@ -39,7 +45,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       )
     ));
 
-    $namespace = $this->my_namespace . $this->my_version;
+    /*$namespace = $this->my_namespace . $this->my_version;
     $base      = 'stufen';
     register_rest_route( $namespace, '/' . $base, array(
       array(
@@ -47,7 +53,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
           'callback'  => array( $this, 'update_or_delete_stufen' ),
           'permission_callback' => array( $this, 'update_or_delete_stufen_permission' )
       )
-    ));
+    ));*/
 
     register_rest_route( $namespace, '/' . $base."/update/", array(
       array(
@@ -115,7 +121,9 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
   }
 
   public function update_or_delete_stufen_permission(){
-      return true;//current_user_can('administrator');
+      //return true;
+    $nonce = (string) $request['_nonce'];
+    return check_ajax_referer( 'wp_rest', '_nonce', false );
   }
  
   public function update_or_delete_stufen(WP_REST_Request $request){
@@ -137,14 +145,12 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     return $json_request;
   }
 
-
-
   public function get_update_stufen_schema(){
     return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_update_stufen.json');
   }
 
   public function update_stufe_permission(){
-      return true;//current_user_can('administrator');
+    return current_user_can('manage_options');
   }
 
   public function update_stufe(WP_REST_Request $request){
@@ -168,8 +174,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_insert_stufen.json');
   }
 
-  public function insert_stufe_permission(){
-      return true;//current_user_can('administrator');
+  public function insert_stufe_permission(WP_REST_Request $request){
+    return current_user_can('manage_options');
   }
 
   public function insert_stufe( WP_REST_Request $request ){
@@ -196,7 +202,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
   }
 
   public function delete_stufe_permission(){
-      return true;//current_user_can('administrator');
+    return current_user_can('manage_options');
   }
 
   public function delete_stufe( WP_REST_Request $request ){

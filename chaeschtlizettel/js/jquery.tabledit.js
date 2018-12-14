@@ -29,6 +29,7 @@ if (typeof jQuery === 'undefined') {
 
         var defaults = {
             url: window.location.href,
+            nonce: 'undefined',
             inputClass: 'form-control input-sm',
             toolbarClass: 'btn-toolbar',
             groupClass: 'btn-group btn-group-sm',
@@ -373,34 +374,40 @@ if (typeof jQuery === 'undefined') {
                 return false;
             }
 
-            var jqXHR = $.post(settings.url + "/" + action, serialize, function(data, textStatus, jqXHR) {
-                if (action === settings.buttons.edit.action) {
-                    $lastEditedRow.removeClass(settings.dangerClass).addClass(settings.warningClass);
-                    setTimeout(function() {
-                        //$lastEditedRow.removeClass(settings.warningClass);
-                        $table.find('tr.' + settings.warningClass).removeClass(settings.warningClass);
-                    }, 1400);
+            
+            var jqXHR = $.ajax({
+                url : settings.url + "/" + action,
+                method : "post",
+                beforeSend: function ( xhr ) {
+                xhr.setRequestHeader( 'X-WP-Nonce', settings.nonce );
+                },
+                data : serialize,
+                success: function(data, textStatus, jqXHR) {
+                    if (action === settings.buttons.edit.action) {
+                        $lastEditedRow.removeClass(settings.dangerClass).addClass(settings.warningClass);
+                        setTimeout(function() {
+                            $table.find('tr.' + settings.warningClass).removeClass(settings.warningClass);
+                        }, 1400);
+                    }
+
+                    settings.onSuccess(data, textStatus, jqXHR);
+                },
+                fail: function(jqXHR, textStatus, errorThrown) {
+                    if (action === settings.buttons.delete.action) {
+                        $lastDeletedRow.removeClass(settings.mutedClass).addClass(settings.dangerClass);
+                        $lastDeletedRow.find('.tabledit-toolbar button').attr('disabled', false);
+                        $lastDeletedRow.find('.tabledit-toolbar .tabledit-restore-button').hide();
+                    } else if (action === settings.buttons.edit.action) {
+                        $lastEditedRow.addClass(settings.dangerClass);
+                    }
+
+                    settings.onFail(jqXHR, textStatus, errorThrown);
+                },
+                always: function() {
+                    settings.onAlways();
                 }
-
-                settings.onSuccess(data, textStatus, jqXHR);
-            }, 'json');
-
-            jqXHR.fail(function(jqXHR, textStatus, errorThrown) {
-                if (action === settings.buttons.delete.action) {
-                    $lastDeletedRow.removeClass(settings.mutedClass).addClass(settings.dangerClass);
-                    $lastDeletedRow.find('.tabledit-toolbar button').attr('disabled', false);
-                    $lastDeletedRow.find('.tabledit-toolbar .tabledit-restore-button').hide();
-                } else if (action === settings.buttons.edit.action) {
-                    $lastEditedRow.addClass(settings.dangerClass);
-                }
-
-                settings.onFail(jqXHR, textStatus, errorThrown);
             });
-
-            jqXHR.always(function() {
-                settings.onAlways();
-            });
-
+            
             return jqXHR;
         }
 

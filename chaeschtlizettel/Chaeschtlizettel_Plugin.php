@@ -368,7 +368,6 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     }
 
     public function addActionsAndFilters() {
-
         // Add options administration page
         // http://plugin.michael-simpson.com/?page_id=47
         add_action('admin_menu', array(&$this, 'addSettingsSubMenuPage'));
@@ -390,9 +389,33 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // Adding scripts & styles to all pages
         // Examples:
         wp_enqueue_script('jquery');
-        wp_enqueue_script( 'jquery-serializejson-js', plugins_url( '/js/jquery.serializejson.min.js', __FILE__ ), array('jquery') );
-        // wp_enqueue_style('my-style', plugins_url('/css/my-style.css', __FILE__));
-        //wp_enqueue_script('chaeschtlizettel-script', plugins_url('/js/chaeschtlizettel.js', __FILE__));
+        wp_enqueue_script('jquery-serializejson-js', plugins_url( '/js/jquery.serializejson.min.js', __FILE__ ), array('jquery'));
+        /*wp_register_script('wpapi', plugins_url( '/js/wpapi/wpapi.min.js', __FILE__) . 'wpapi.min.js');
+  
+        // Register our own first-party script, which depends on "wpapi"
+        wp_register_script(
+            'init-wpapi',
+            // wpapi-demo.js should be in the same directory as this PHP file
+            plugins_url( '/js/wpapi/init-wpapijs', __FILE__) . 'init-wpapi.js',
+            array( 'wpapi' ),
+            false,
+            true // enqueue in footer
+        );
+
+        // Localize our script to inject a NONCE that can be used to auth
+        wp_localize_script(
+            'init-wpapi',
+            'WP_API_Settings',
+            array(
+                'root' => esc_url_raw( rest_url() ),
+                'nonce' => wp_create_nonce( 'wp_rest' )
+            )
+        );*/
+
+        // Enqueue our script
+        wp_enqueue_script( 'init-wpapi' );
+ 
+        
         wp_enqueue_style('chaeschtlizettel-style', plugins_url('/css/chaeschtlizettel.css', __FILE__));
         wp_enqueue_style('clockpicker-style', plugins_url('/css/clockpicker.css', __FILE__));
         wp_enqueue_style('standalone-style', plugins_url('/css/standalone.css', __FILE__));
@@ -476,6 +499,9 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     }
 
     public function outputTabStufenContents(){
+        $nonce = wp_create_nonce( 'wp_rest' );
+        echo ('<p>'.$nonce.'</p>');
+
       ?>
       <div id="errorMessageContainer"></div>
       <div id="stufeTableContainer"></div>
@@ -518,6 +544,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           function makeTableEditable(){
             $('#stufenTable').Tabledit({
             url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
+            nonce: '<?php echo ($nonce);?>',
             restoreButton: false,
             deleteCallbackFunction: function() {
                 loadStufenTable();
@@ -535,13 +562,22 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           });
 
           function addNewStufe(){
-            //var frm = $('#newStufeForm');
-            var data = JSON.stringify($('#newStufeForm').serializeJSON());
+            var formData = JSON.stringify($('#newStufeForm').serializeJSON());
 
-            $.post('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/insert', data, function(data, response) {
-              $("#newStufeForm")[0].reset();
-              loadStufenTable();
-            });
+            $.ajax( {
+              url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/insert/',
+              method: 'POST',
+              beforeSend: function ( xhr ) {
+                xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
+              },
+              data: formData
+              } ).done( function ( response ) {
+                console.log( response );
+                $("#newStufeForm")[0].reset();
+                loadStufenTable();
+            } );
+            
+
           }
 
           loadStufenTable();
