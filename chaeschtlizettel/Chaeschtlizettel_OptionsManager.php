@@ -309,7 +309,7 @@ class Chaeschtlizettel_OptionsManager {
             </tr>
             </tbody></table>
 
-            <h2><?php echo $this->getPluginDisplayName(); echo ' '; _e('Settings', 'chaeschtlizettel'); ?></h2>
+            <h2>Settings</h2>
 
             <form method="post" action="">
             <?php settings_fields($settingsGroup); ?>

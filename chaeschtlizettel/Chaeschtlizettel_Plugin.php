@@ -34,17 +34,11 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         //  http://plugin.michael-simpson.com/?page_id=31
         return array(
             //'_version' => array('Installed Version'), // Leave this one commented-out. Uncomment to test upgrades.
-            'ATextInput' => array(__('Enter in some text', 'my-awesome-plugin')),
-            'AmAwesome' => array(__('I like this awesome plugin', 'my-awesome-plugin'), 'false', 'true'),
-            'CanDoSomething' => array(__('Which user role can do something', 'my-awesome-plugin'),
-                                        'Administrator', 'Editor', 'Author', 'Contributor', 'Subscriber', 'Anyone')
+            //'ATextInput' => array(__('Enter in some text', 'my-awesome-plugin')),
+            //'AmAwesome' => array(__('I like this awesome plugin', 'my-awesome-plugin'), 'false', 'true'),
+            //'CanDoSomething' => array(__('Which user role can do something', 'my-awesome-plugin'), 'Administrator', 'Editor', 'Author', 'Contributor', 'Subscriber', 'Anyone')
         );
     }
-
-//    protected function getOptionValueI18nString($optionValue) {
-//        $i18nValue = parent::getOptionValueI18nString($optionValue);
-//        return $i18nValue;
-//    }
 
     protected function initOptions() {
         $options = $this->getOptionMetaData();
@@ -447,7 +441,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         }
       ?>
       <div>
-        <h1>Chaeschtlizettel Settings</h1>
+        <h2><?php echo $this->getPluginDisplayName(); echo ' '; _e('Settings', 'chaeschtlizettel'); ?></h2>
       </div>
 
       <script type="text/javascript">
