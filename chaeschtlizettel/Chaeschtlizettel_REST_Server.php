@@ -45,16 +45,6 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       )
     ));
 
-    /*$namespace = $this->my_namespace . $this->my_version;
-    $base      = 'stufen';
-    register_rest_route( $namespace, '/' . $base, array(
-      array(
-          'methods' => WP_REST_Server::EDITABLE,
-          'callback'  => array( $this, 'update_or_delete_stufen' ),
-          'permission_callback' => array( $this, 'update_or_delete_stufen_permission' )
-      )
-    ));*/
-
     register_rest_route( $namespace, '/' . $base."/update/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
@@ -183,15 +173,26 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
-    $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
-
+    
     if (isset($json_request['name'])) {
       $wpdb->show_errors(); 
-      return $wpdb->insert($table_name, array('name' => $json_request['name'], 
+      $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
+      $chaeschtlizettel_table_name = $chaeschtlizettel_plugin->prefixTableName('chaeschtlizettel');
+      $status = $wpdb->insert($stufen_table_name, array('name' => $json_request['name'], 
           'erstellt' => current_time( 'mysql' ), 
           'abteilung' => $json_request['abteilung'], 
           'jahrgang' => $json_request['jahrgang']), 
         array('%s', '%s'));
+      if ($status == 1){
+        $sql_stmt = "SELECT stufen_id FROM $stufen_table_name WHERE name = %s";
+        $sql = $wpdb->prepare($sql_stmt, $json_request['name']);
+        $stufen_id = intval($wpdb->get_results($sql)[0]->stufen_id);
+        
+        $status = $wpdb->insert($chaeschtlizettel_table_name, array('stufen_id' => $stufen_id, 
+          'wo' => 'undefined'), 
+          array('%s', '%s'));
+        return $status;
+      }
     }
     return 'bad request';
   }
@@ -210,11 +211,14 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
-    $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
+      $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
+      $chaeschtlizettel_table_name = $chaeschtlizettel_plugin->prefixTableName('chaeschtlizettel');
 
     if (isset($json_request['stufen_id'])) {
       $wpdb->show_errors(); 
-      return $wpdb->delete($table_name, array('stufen_id' => $json_request['stufen_id']), array('%d'));
+      if ($wpdb->delete($stufen_table_name, array('stufen_id' => $json_request['stufen_id']), array('%d'))){
+       return $wpdb->delete($chaeschtlizettel_table_name, array('stufen_id' => $json_request['stufen_id']), array('%d'));
+      }
     }
     return 'bad request';
   }

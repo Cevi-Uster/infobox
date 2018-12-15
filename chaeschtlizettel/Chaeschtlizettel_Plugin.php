@@ -549,10 +549,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
                 $("#newStufeForm")[0].reset();
                 loadStufenTable();
             } );
-            
-
           }
-
           loadStufenTable();
         });
       </script>
