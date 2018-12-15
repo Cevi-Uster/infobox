@@ -390,31 +390,6 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // Examples:
         wp_enqueue_script('jquery');
         wp_enqueue_script('jquery-serializejson-js', plugins_url( '/js/jquery.serializejson.min.js', __FILE__ ), array('jquery'));
-        /*wp_register_script('wpapi', plugins_url( '/js/wpapi/wpapi.min.js', __FILE__) . 'wpapi.min.js');
-  
-        // Register our own first-party script, which depends on "wpapi"
-        wp_register_script(
-            'init-wpapi',
-            // wpapi-demo.js should be in the same directory as this PHP file
-            plugins_url( '/js/wpapi/init-wpapijs', __FILE__) . 'init-wpapi.js',
-            array( 'wpapi' ),
-            false,
-            true // enqueue in footer
-        );
-
-        // Localize our script to inject a NONCE that can be used to auth
-        wp_localize_script(
-            'init-wpapi',
-            'WP_API_Settings',
-            array(
-                'root' => esc_url_raw( rest_url() ),
-                'nonce' => wp_create_nonce( 'wp_rest' )
-            )
-        );*/
-
-        // Enqueue our script
-        wp_enqueue_script( 'init-wpapi' );
- 
         
         wp_enqueue_style('chaeschtlizettel-style', plugins_url('/css/chaeschtlizettel.css', __FILE__));
         wp_enqueue_style('clockpicker-style', plugins_url('/css/clockpicker.css', __FILE__));
@@ -467,41 +442,39 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     }
 
     public function settingsPage() {
-      if (!current_user_can('manage_options')) {
-        wp_die(__('You do not have sufficient permissions to access this page.', 'TEXT-DOMAIN'));
-      }
-    ?>
-    <div>
-      <h1>Chaeschtlizettel Settings</h1>
-    </div>
+        if (!current_user_can('manage_options')) {
+          wp_die(__('You do not have sufficient permissions to access this page.', 'TEXT-DOMAIN'));
+        }
+      ?>
+      <div>
+        <h1>Chaeschtlizettel Settings</h1>
+      </div>
 
-    <script type="text/javascript">
-      jQuery(function() {
-        jQuery("#plugin_config_tabs").tabs();
-      });
-    </script>
+      <script type="text/javascript">
+        jQuery(function() {
+          jQuery("#plugin_config_tabs").tabs();
+        });
+      </script>
 
-    <div class="plugin_config">
-      <div id="plugin_config_tabs">
-        <ul>
-          <li><a href="#plugin_config-1">Stufen</a></li>
-          <li><a href="#plugin_config-2">Options</a></li>
-        </ul>
-        <div id="plugin_config-1">
-          <?php $this->outputTabStufenContents(); ?>
-        </div>
-        <div id="plugin_config-2">
-          <?php parent::settingsPage(); ?>
+      <div class="plugin_config">
+        <div id="plugin_config_tabs">
+          <ul>
+            <li><a href="#plugin_config-1">Stufen</a></li>
+            <li><a href="#plugin_config-2">Options</a></li>
+          </ul>
+          <div id="plugin_config-1">
+            <?php $this->outputTabStufenContents(); ?>
+          </div>
+          <div id="plugin_config-2">
+            <?php parent::settingsPage(); ?>
+          </div>
         </div>
       </div>
-    </div>
-    <?php
+      <?php
     }
 
     public function outputTabStufenContents(){
         $nonce = wp_create_nonce( 'wp_rest' );
-        echo ('<p>'.$nonce.'</p>');
-
       ?>
       <div id="errorMessageContainer"></div>
       <div id="stufeTableContainer"></div>
