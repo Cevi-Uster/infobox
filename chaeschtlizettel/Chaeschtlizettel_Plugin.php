@@ -454,12 +454,16 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         <div id="plugin_config_tabs">
           <ul>
             <li><a href="#plugin_config-1">Stufen</a></li>
-            <li><a href="#plugin_config-2">Options</a></li>
+            <li><a href="#plugin_config-2">Stufenmitglieder</a></li>
+            <li><a href="#plugin_config-3">Options</a></li>
           </ul>
           <div id="plugin_config-1">
             <?php $this->outputTabStufenContents(); ?>
           </div>
           <div id="plugin_config-2">
+            <?php $this->outputTabStufenMemberContents(); ?>
+          </div>
+          <div id="plugin_config-3">
             <?php parent::settingsPage(); ?>
           </div>
         </div>
@@ -545,6 +549,54 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             } );
           }
           loadStufenTable();
+        });
+      </script>
+      <?php
+    }
+
+    public function outputTabStufenMemberContents(){
+      $nonce = wp_create_nonce( 'wp_rest' );
+      ?>
+      <div id="errorMessageContainer"></div>
+      <div id="stufeMemberTableContainer"></div>
+      <script type="text/javascript">
+        jQuery(document).ready(function($) {
+
+            function loadStufenmemberTable(){
+            console.log('Try to load stufenmember from REST');
+            $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember', {}, function(data, response) {
+              var html = '<table id="stufenmemberTable" class="table table-striped table-bordered">';
+              html += '<thead>';
+              html += '<th>id</th><th>user_id</th><th>stufen_id</th><th>erstellt</th>';
+              html += '</thead>';
+              html += '<tbody>';
+              html += data.reduce(function(string, item) {
+                return string + "<tr><td>" + item.id + "</td><td>" + item.user_id  + "</td><td>" + item.stufen_id + "</td><td>" + item.erstellt +  "</td></tr>"
+              }, '');
+              html += '</tbody>';
+              html += '</table>';
+              $('div#stufeMemberTableContainer').html(html);
+              makeTableEditable();
+            });
+          }
+
+          function makeTableEditable(){
+            console.log('Make stufenmemberTable editable');
+            $('#stufenmemberTable').Tabledit({
+            url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember',
+            nonce: '<?php echo ($nonce);?>',
+            restoreButton: false,
+            deleteCallbackFunction: function() {
+                loadStufenmemberTable();
+            },
+            columns: {
+              identifier: [0, 'id'],
+              editable: [[1, 'user_id'], [2, 'stufen_id']]
+            }
+            });
+          }
+
+          loadStufenmemberTable();
         });
       </script>
       <?php

@@ -36,8 +36,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
  
   public function register_routes() {
     $namespace = $this->my_namespace . $this->my_version;
-    $base      = 'stufen';
-    register_rest_route( $namespace, '/' . $base, array(
+    $baseStufen      = 'stufen';
+    register_rest_route( $namespace, '/' . $baseStufen, array(
       array(
           'methods' => WP_REST_Server::READABLE,
           'callback'  => array( $this, 'get_stufen' ),
@@ -45,7 +45,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       )
     ));
 
-    register_rest_route( $namespace, '/' . $base."/update/", array(
+    register_rest_route( $namespace, '/' . $baseStufen."/update/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'update_stufe' ),
@@ -54,7 +54,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       'schema' => array( $this,'get_update_stufen_schema')
     ));
 
-    register_rest_route( $namespace, '/' . $base."/insert/", array(
+    register_rest_route( $namespace, '/' . $baseStufen."/insert/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'insert_stufe' ),
@@ -63,13 +63,22 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       'schema' => array( $this,'get_insert_stufen_schema')
     ));
 
-    register_rest_route( $namespace, '/' . $base."/delete/", array(
+    register_rest_route( $namespace, '/' . $baseStufen."/delete/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'delete_stufe' ),
           'permission_callback' => array( $this, 'delete_stufe_permission' )
       ),
       'schema' => array( $this,'get_delete_stufen_schema')
+    ));
+
+    $baseStufenMember = 'stufenmember';
+    register_rest_route( $namespace, '/' . $baseStufenMember, array(
+      array(
+          'methods' => WP_REST_Server::READABLE,
+          'callback'  => array( $this, 'get_stufenmember' ),
+          'permission_callback' => array( $this, 'get_stufenmember_permission' )
+      )
     ));
 
     register_rest_route( $namespace, '/chaeschtlizettel/(?P<id>\d+)', array(
@@ -221,6 +230,22 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       }
     }
     return 'bad request';
+  }
+
+  public function get_stufenmember_permission(){
+      // return current_user_can('manage_options');
+      // Everyone may read this information!
+      return true;
+  }
+ 
+  public function get_stufenmember(WP_REST_Request $request){
+    $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
+    global $wpdb;
+    $table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
+    $sql_stmt = "SELECT id, user_id, stufen_id, erstellt FROM $table_name";
+    //$sql = $wpdb->prepare($sql_stmt);
+    $result = $wpdb->get_results($sql_stmt, OBJECT);
+    return $result;
   }
 
   public function get_chaeschtlizettel_permission(){
