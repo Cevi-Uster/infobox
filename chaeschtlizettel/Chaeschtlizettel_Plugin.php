@@ -502,6 +502,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
               html += '</thead>';
               html += '<tbody>';
+              console.log(data);
               html += data.reduce(function(string, item) {
                 return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name  + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang +  "</td></tr>"
               }, '');
@@ -567,11 +568,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember', {}, function(data, response) {
               var html = '<table id="stufenmemberTable" class="table table-striped table-bordered">';
               html += '<thead>';
-              html += '<th>id</th><th>user_id</th><th>stufen_id</th><th>erstellt</th>';
+              html += '<th>id</th><th>user_name</th><th>stufen_name</th>';
               html += '</thead>';
               html += '<tbody>';
+              console.log(data);
               html += data.reduce(function(string, item) {
-                return string + "<tr><td>" + item.id + "</td><td>" + item.user_id  + "</td><td>" + item.stufen_id + "</td><td>" + item.erstellt +  "</td></tr>"
+                return string + "<tr><td>" + item.id + "</td><td>" + item.user_name  + "</td><td>" + item.stufen_name + "</td><td>";
               }, '');
               html += '</tbody>';
               html += '</table>';

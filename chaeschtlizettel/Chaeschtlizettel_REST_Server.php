@@ -241,10 +241,25 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
   public function get_stufenmember(WP_REST_Request $request){
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
-    $table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
-    $sql_stmt = "SELECT id, user_id, stufen_id, erstellt FROM $table_name";
-    //$sql = $wpdb->prepare($sql_stmt);
-    $result = $wpdb->get_results($sql_stmt, OBJECT);
+    $result = array();
+    $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
+    $sql_stmt = "SELECT id, user_id, stufen_id, erstellt FROM $match_user_stufen_table_name";
+    $match_user_stufen_result = $wpdb->get_results($sql_stmt, OBJECT);
+
+    foreach ($match_user_stufen_result as $match_user_stufen) {
+      $user = get_user_by('id', $match_user_stufen->user_id);
+      $user_name = $user != null ? $user->user_login : "<unknown>";
+
+      $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
+      $sql_stmt = "SELECT name FROM $stufen_table_name WHERE stufen_id = %d";
+      $sql = $wpdb->prepare($sql_stmt, $match_user_stufen->stufen_id);
+
+      $stufen_result = $wpdb->get_results($sql);
+      $stufen_name = count($stufen_result) == 1  &&  $stufen_result[0]->name != null ? $stufen_result[0]->name : "<unknown>";
+
+      $result[] =array("id"=>$match_user_stufen->id, "user_name"=>$user_name, "stufen_name"=>$stufen_name);
+    }
+
     return $result;
   }
 
