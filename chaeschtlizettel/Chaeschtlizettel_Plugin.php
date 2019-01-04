@@ -502,7 +502,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
               html += '</thead>';
               html += '<tbody>';
-              console.log(data);
+              //console.log(data);
               html += data.reduce(function(string, item) {
                 return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name  + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang +  "</td></tr>"
               }, '');
@@ -578,11 +578,39 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               html += '</tbody>';
               html += '</table>';
               $('div#stufeMemberTableContainer').html(html);
-              makeTableEditable();
+              $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen', {}, function(data, response) {
+                var stufenNames = {};
+                data.forEach(function(stufe){
+                  stufenNames[stufe.name] = stufe.name;
+                });
+                loadUsers(1, stufenNames);
+              });
             });
           }
 
-          function makeTableEditable(){
+          function loadUsers(page, stufenNames, userNames){
+            var perPage = 10;
+            if (page === undefined){
+              page = 1;
+            }
+            if (userNames === undefined){
+              userNames = {};
+            }
+            $.get('<?php get_rest_url(null)?>/wp-json/wp/v2/users?per_page='+perPage+'&page='+page, {}, function(data, response) {
+                  data.forEach(function(user){
+                    userNames[user.name] = user.name;
+                  });
+                  console.log(userNames);
+                  if (data.length == perPage){
+                    page++;
+                    loadUsers(page, stufenNames, userNames);
+                  } else {
+                    makeTableEditable(JSON.stringify(stufenNames), JSON.stringify(userNames));
+                  }
+                });
+          }
+
+          function makeTableEditable(stufenNames, userNames){
             console.log('Make stufenmemberTable editable');
             $('#stufenmemberTable').Tabledit({
             url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember',
@@ -593,7 +621,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             },
             columns: {
               identifier: [0, 'id'],
-              editable: [[1, 'user_id'], [2, 'stufen_id']]
+              editable: [[1, 'user_name', userNames], [2, 'stufen_name', stufenNames]]
             }
             });
           }
