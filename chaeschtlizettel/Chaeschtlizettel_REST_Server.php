@@ -90,6 +90,15 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       'schema' => array( $this,'get_update_stufenmember_schema')
     ));
 
+    register_rest_route( $namespace, '/' . $baseStufenMember."/delete/", array(
+      array(
+          'methods' => WP_REST_Server::EDITABLE,
+          'callback'  => array( $this, 'delete_stufenmember' ),
+          'permission_callback' => array( $this, 'delete_stufenmember_permission' )
+      ),
+      'schema' => array( $this,'get_update_stufenmember_schema')
+    ));
+
     register_rest_route( $namespace, '/chaeschtlizettel/(?P<id>\d+)', array(
       array(
         'methods'  => WP_REST_Server::READABLE,
@@ -286,7 +295,6 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
 
-
     if (isset($json_request['id']) && isset($json_request['user_name']) && isset($json_request['stufen_name'])) {
       $wpdb->show_errors();
       $user_name=$json_request['user_name'];
@@ -299,9 +307,31 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       $stufen_id = intval($wpdb->get_results($sql)[0]->stufen_id);
       
       $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
-      $wpdb->update($match_user_stufen_table_name, array('user_id' => $user->id, 
+      return $wpdb->update($match_user_stufen_table_name, array('user_id' => $user->id, 
           'stufen_id' => $stufen_id), array('id' => $json_request['id']), array('%s'), array('%d'));
-      return  $user_name . " - ". $user . " - " . $stufen_id;
+    }
+    return 'bad request';
+  }
+
+  public function get_delete_stufenmember_schema(){
+    return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_delete_stufenmember.json');
+  }
+
+  public function delete_stufenmember_permission(){
+    return current_user_can('manage_options');
+  }
+
+  public function delete_stufenmember(WP_REST_Request $request){
+    $json_request = json_decode($request->get_body(), true);
+
+    $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
+    global $wpdb;
+
+    if (isset($json_request['id'])) {
+      $wpdb->show_errors();
+         
+      $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
+      return $wpdb->delete($match_user_stufen_table_name, array('id' => $json_request['id']), array('%d'));
     }
     return 'bad request';
   }

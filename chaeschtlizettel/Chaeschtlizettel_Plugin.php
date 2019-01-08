@@ -188,17 +188,13 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // stufen id suchen
         $tableName = $this->prefixTableName('stufen');
         $sql_stmt = "SELECT stufen_id FROM $tableName WHERE name = %s";
-        $sql = $wpdb->prepare($sql_stmt,
-                              $atts['stufe']
-                              );
+        $sql = $wpdb->prepare($sql_stmt, $atts['stufe']);
 
         $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
 
         $tableName = $this->prefixTableName('chaeschtlizettel');
         $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
-        $sql = $wpdb->prepare($sql_stmt,
-                              $stufenId
-                              );
+        $sql = $wpdb->prepare($sql_stmt, $stufenId);
         //echo $sql;
 
         $result = $wpdb->get_results($sql);
@@ -560,6 +556,20 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       ?>
       <div id="errorMessageContainer"></div>
       <div id="stufeMemberTableContainer"></div>
+      <br/>
+      Neues Stufenmitglied:<br/>
+      <form id="newStufenmemberForm">
+        <div class="form-group">
+          <label for="user_name">User name:</label>
+          <select type="text" name="user_name" id="newStufenmemberUserName" class="form-control input-sm">
+          </select>
+          <label for="stufen_name">Stufenname:</label>
+          <select name="stufen_name" id="newStufenmemberStufenName" class="form-control input-sm">
+          </select>
+          <br/>
+          <input type="submit" id="newStufenmemberFormSubmitButton" value="Hinzuf&uuml;gen">
+        </div>
+      </form>
       <script type="text/javascript">
         jQuery(document).ready(function($) {
 
@@ -578,14 +588,21 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               html += '</tbody>';
               html += '</table>';
               $('div#stufeMemberTableContainer').html(html);
-              $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen', {}, function(data, response) {
+              loadStufen();
+            });
+          }
+
+          function loadStufen(){
+            $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen', {}, function(data, response) {
                 var stufenNames = {};
+                var stufenOptionHtml = "";
                 data.forEach(function(stufe){
                   stufenNames[stufe.name] = stufe.name;
+                  stufenOptionHtml += '<option value="' + stufe.name + '">' + stufe.name + '</option>';
                 });
+                $('select#newStufenmemberStufenName').html(stufenOptionHtml);
                 loadUsers(1, stufenNames);
               });
-            });
           }
 
           function loadUsers(page, stufenNames, userNames){
@@ -597,17 +614,22 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               userNames = {};
             }
             $.get('<?php get_rest_url(null)?>/wp-json/wp/v2/users?per_page='+perPage+'&page='+page, {}, function(data, response) {
-                  data.forEach(function(user){
-                    userNames[user.name] = user.name;
-                  });
-                  console.log(userNames);
-                  if (data.length == perPage){
-                    page++;
-                    loadUsers(page, stufenNames, userNames);
-                  } else {
-                    makeTableEditable(JSON.stringify(stufenNames), JSON.stringify(userNames));
-                  }
-                });
+              data.forEach(function(user){
+                userNames[user.name] = user.name;
+              });
+              console.log(userNames);
+              if (data.length == perPage){
+                page++;
+                loadUsers(page, stufenNames, userNames);
+              } else {
+                var userOptionHtml="";
+                for (var key in userNames) {
+                  userOptionHtml += '<option value="' + userNames[key] + '">' + userNames[key] + '</option>';
+                }
+                $('select#newStufenmemberUserName').html(userOptionHtml);
+                makeTableEditable(JSON.stringify(stufenNames), JSON.stringify(userNames));
+              }
+            });
           }
 
           function makeTableEditable(stufenNames, userNames){
