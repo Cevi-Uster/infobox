@@ -648,6 +648,28 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             });
           }
 
+          document.getElementById("newStufenmemberFormSubmitButton").addEventListener("click", function(event){
+              event.preventDefault();
+              addNewStufenmember();
+          });
+
+          function addNewStufenmember(){
+            var formData = JSON.stringify($('#newStufenmemberForm').serializeJSON());
+
+            $.ajax( {
+              url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember/insert/',
+              method: 'POST',
+              beforeSend: function ( xhr ) {
+                xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
+              },
+              data: formData
+              } ).done( function ( response ) {
+                console.log( response );
+                $("#newStufenmemberForm")[0].reset();
+                loadStufenmemberTable();
+            } );
+          }
+
           loadStufenmemberTable();
         });
       </script>

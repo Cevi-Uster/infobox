@@ -81,6 +81,15 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       )
     ));
 
+  register_rest_route( $namespace, '/' . $baseStufenMember."/insert/", array(
+      array(
+          'methods' => WP_REST_Server::EDITABLE,
+          'callback'  => array( $this, 'insert_stufenmember' ),
+          'permission_callback' => array( $this, 'insert_stufenmember_permission' )
+      ),
+      'schema' => array( $this,'get_insert_stufenmember_schema')
+    ));
+
     register_rest_route( $namespace, '/' . $baseStufenMember."/update/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
@@ -279,6 +288,38 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     }
 
     return $result;
+  }
+
+  public function get_insert_stufenmember_schema(){
+    return file_get_contents(plugin_dir_path(__FILE__).'JSON_Schema_insert_stufenmember.json');
+  }
+
+  public function insert_stufenmember_permission(){
+    return current_user_can('manage_options');
+  }
+
+  public function insert_stufenmember(WP_REST_Request $request){
+    $json_request = json_decode($request->get_body(), true);
+
+    $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
+    global $wpdb;
+
+    if (isset($json_request['user_name']) && isset($json_request['stufen_name'])) {
+      $wpdb->show_errors();
+      $user_name=$json_request['user_name'];
+      $user = get_user_by('login', $user_name);
+
+      $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
+      $sql_stmt = "SELECT stufen_id FROM $stufen_table_name WHERE name = %s";
+      $sql = $wpdb->prepare($sql_stmt, $json_request['stufen_name']);
+
+      $stufen_id = intval($wpdb->get_results($sql)[0]->stufen_id);
+      
+      $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
+      return $wpdb->insert($match_user_stufen_table_name, array('user_id' => $user->id, 
+          'stufen_id' => $stufen_id),  array('%s'));
+    }
+    return 'bad request';
   }
 
   public function get_update_stufenmember_schema(){

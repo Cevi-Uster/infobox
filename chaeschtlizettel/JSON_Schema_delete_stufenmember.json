@@ -1,0 +1,22 @@
+{
+   "definitions": {},
+   "$schema": "",
+   "$id": "https://github.com/Cevi-Uster/infobox/tree/master/chaeschtlizettel/JSON_Schema_update_stufenmember.json",
+   "type": "object",
+   "title": "Update Stufenmember Schema",
+   "default": null,
+   "required": [
+     "id"
+   ],
+   "properties": {
+     "id": {
+       "$id": "#/properties/id",
+       "type": "integer",
+       "title": "StufenMemberID",
+       "default": "",
+       "examples": [
+         "5"
+       ]
+     }
+   }
+}
