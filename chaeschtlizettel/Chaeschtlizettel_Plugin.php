@@ -492,7 +492,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         jQuery(document).ready(function($) {
 
             function loadStufenTable(){
-            $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen', {}, function(data, response) {
+            $.ajax({
+              url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
+              beforeSend: function ( xhr ) {
+                xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
+              },
+              success: function(data, response) {
               var html = '<table id="stufenTable" class="table table-striped table-bordered">';
               html += '<thead>';
               html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
@@ -505,8 +510,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               html += '</tbody>';
               html += '</table>';
               $('div#stufeTableContainer').html(html);
-              makeTableEditable();
-            });
+                makeTableEditable();
+             },
+             error: function(XMLHttpRequest, textStatus, errorThrown){
+               $('div#errorMessageContainer').html('<p>Could not load Stufen form server. Got error: ' + errorThrown + '</p>');
+             }
+           });
           }
 
           function makeTableEditable(){
