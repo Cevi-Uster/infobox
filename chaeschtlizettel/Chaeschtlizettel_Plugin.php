@@ -397,7 +397,9 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           wp_enqueue_style('bootstrap-yeti-style', plugins_url('/css/bootstrap-yeti.min.css', __FILE__));
           wp_enqueue_script('jquery-ui-core');
           wp_enqueue_script('jquery-ui-tabs');
-          wp_enqueue_script( 'clockpicker-script', plugins_url( '/js/jquery.tabledit.js', __FILE__ ), array('jquery') );
+          wp_enqueue_script( 'table-edit-script', plugins_url( '/js/jquery.tabledit.js', __FILE__ ), array('jquery') );
+          wp_enqueue_script( 'chaeschtli-settings-script', plugins_url( '/js/chaeschtli.settings.js', __FILE__ ), array('jquery') );
+          
           // enqueue any othere scripts/styles you need to use
         }
 
@@ -513,78 +515,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       </form>
       <script type="text/javascript">
         jQuery(document).ready(function($) {
-
-            function loadStufenTable(){
-            $.ajax({
-              url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
-              beforeSend: function ( xhr ) {
-                xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
-              },
-              success: function(data, response) {
-                var html = '<table id="stufenTable" class="table table-striped table-bordered">';
-                html += '<thead>';
-                html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
-                html += '</thead>';
-                html += '<tbody>';
-                //console.log(data);
-                html += data.reduce(function(string, item) {
-                  return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name  + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang +  "</td></tr>"
-                }, '');
-                html += '</tbody>';
-                html += '</table>';
-                $('div#stufeTableContainer').html(html);
-                makeTableEditable();
-             },
-             error: function(XMLHttpRequest, textStatus, errorThrown){
-               $('div#errorMessageContainer').html('<p>Could not load Stufen form server. Got error: ' + errorThrown + '</p>');
-               $('div#errorMessageContainer').attr('class', 'alert alert-warning');
-               $('div#errorMessageContainer').attr('role', 'warning');
-             }
-           });
-          }
-
-          function makeTableEditable(){
-            $('#stufenTable').Tabledit({
-            url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen',
-            nonce: '<?php echo ($nonce);?>',
-            restoreButton: false,
-            deleteCallbackFunction: function() {
-                loadStufenTable();
-            },
-            columns: {
-              identifier: [0, 'stufen_id'],
-              editable: [[1, 'name'], [2, 'abteilung', '{"m": "Knaben", "f": "Mädchen"}'], [3, 'jahrgang']]
-            }
-            });
-          }
-
-          document.getElementById("newStufeFormSubmitButton").addEventListener("click", function(event){
-              event.preventDefault();
-              addNewStufe();
-          });
-
-          function addNewStufe(){
-            var formData = JSON.stringify($('#newStufeForm').serializeJSON());
-
-            $.ajax( {
-              url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufen/insert/',
-              method: 'POST',
-              beforeSend: function ( xhr ) {
-                xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
-              },
-              error: function(XMLHttpRequest, textStatus, errorThrown){
-               $('div#errorMessageContainer').html('<p>Could not create new Stufe. Got error: ' + errorThrown + '</p>');
-               $('div#errorMessageContainer').attr('class', 'alert alert-warning');
-               $('div#errorMessageContainer').attr('role', 'warning');
-              },
-              data: formData
-              } ).done( function ( response ) {
-                console.log( response );
-                $("#newStufeForm")[0].reset();
-                loadStufenTable();
-            } );
-          }
-          loadStufenTable();
+            jQuery(document).StufenTableFunction('<?php echo ($nonce);?>', '<?php get_rest_url(null)?>');
         });
       </script>
       <?php
