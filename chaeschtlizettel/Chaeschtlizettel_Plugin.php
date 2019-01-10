@@ -363,6 +363,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         add_action('admin_menu', array(&$this, 'addSettingsSubMenuPage'));
 
 
+
+
         // Example adding a script & style just for the options administration page
         // http://plugin.michael-simpson.com/?page_id=47
         //        if (strpos($_SERVER['REQUEST_URI'], $this->getSettingsSlug()) !== false) {
@@ -399,6 +401,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           // enqueue any othere scripts/styles you need to use
         }
 
+
+
         function my_enqueue($hook) {
           if( 'index.php' != $hook ) {
             // Only applies to dashboard panel
@@ -410,6 +414,24 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           wp_enqueue_script( 'chaeschtlizettel-script', plugins_url( '/js/chaeschtlizettel.js', __FILE__ ), array('jquery') );
           // in JavaScript, object properties are accessed as ajax_object.ajax_url, ajax_object.we_value
           wp_localize_script( 'chaeschtlizettel-script', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => 1234 ) );
+        }
+
+        add_filter( 'rest_user_query', 'prefix_remove_has_published_posts_from_wp_api_user_query', 10, 2 );
+        /**
+         * Removes `has_published_posts` from the query args so even users who have not
+         * published content are returned by the request.
+         *
+         * @see https://developer.wordpress.org/reference/classes/wp_user_query/
+         *
+         * @param array           $prepared_args Array of arguments for WP_User_Query.
+         * @param WP_REST_Request $request       The current request.
+         *
+         * @return array
+         */
+        function prefix_remove_has_published_posts_from_wp_api_user_query( $prepared_args, $request ) {
+          unset( $prepared_args['has_published_posts'] );
+
+          return $prepared_args;
         }
 
         // Register short codes
@@ -424,6 +446,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
         // add dashboard widget
         add_action( 'wp_dashboard_setup', array(&$this, 'example_add_dashboard_widgets') );
+
 
         // Register REST Server
         $rest_server = new Chaeschtlizettel_REST_Server();
