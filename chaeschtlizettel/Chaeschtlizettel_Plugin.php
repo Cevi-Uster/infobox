@@ -104,6 +104,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             bis datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             wo VARCHAR(100) NOT NULL,
             infos text,
+            mitnehmen text,
             PRIMARY KEY (stufen_id)
         )$charset_collate;");
 
@@ -148,6 +149,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
           if (!$this->tableColumnExists($tableName, "jahrgang")){
             $upgradeOk  = $upgradeOk && $wpdb->query("ALTER TABLE $tableName ADD COLUMN jahrgang INTEGER");
+          }
+
+          // add column to split infos into infos and mitnehmen
+          $tableName = $this->prefixTableName('chaeschtlizettel');
+          if (!$this->tableColumnExists($tableName, "mitnehmen")){
+            $upgradeOk  = $upgradeOk && $wpdb->query("ALTER TABLE $tableName ADD COLUMN mitnehmen text");
           }
         }
 
@@ -216,7 +223,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           if($von->format('Y-m-d') < $now){
             return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><p>Keine aktuellen Informationen verfügbar.</p></div>';
           }else{
-            return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><h6>Treffpunkt</h6><p>'.$zeit.'<br>'.$chaeschtli->wo.'</p><h6>Mitnehmen</h6><p>'.$chaeschtli->infos.'</p></div>';
+            return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><h6>Treffpunkt</h6><p>'.$zeit.'<br>'.$chaeschtli->wo.'</p><h6>Infos</h6><p>'.$chaeschtli->infos.'</p><h6>Mitnehmen</h6><p>'.$chaeschtli->mitnehmen.'</p></div>';
           }
         }
       } catch (Exception $e) {
@@ -266,6 +273,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           if($von->format('Y-m-d') < $now){
             $status = "abgelaufen";
             $chaeschtli->infos = "";
+            $chaeschtli->mitnehmen = "";
             $chaeschtli->wo = "";
             $von = DateTime::createFromFormat('H:i', '14:00');
             $bis = DateTime::createFromFormat('H:i', '17:00');
@@ -273,6 +281,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             $status = "noch gültig";
           }
         }
+
       }catch (Exception $e) {
         echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
       }
@@ -286,10 +295,33 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     * This function is hooked into the 'wp_dashboard_setup' action below.
     */
    public function example_add_dashboard_widgets() {
+     // stufenname hohlen
+     // Display dashboard widget content
+     $user = get_current_user_id();
+
+     global $wpdb;
+
+     // stufen id suchen
+     $tableName = $this->prefixTableName('match_user_stufen');
+     $sql_stmt = "SELECT stufen_id FROM $tableName WHERE user_id = %s";
+     $sql = $wpdb->prepare($sql_stmt,
+                           $user
+                           );
+
+     $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
+
+     $tableName = $this->prefixTableName('stufen');
+     $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
+     $sql = $wpdb->prepare($sql_stmt,
+                           $stufenId
+                           );
+
+     $result = $wpdb->get_results($sql);
+     $reqStufe = $result[0];
 
      wp_add_dashboard_widget(
                     'chae_dash',         // Widget slug.
-                    'Chäschtlizäddel',         // Title.
+                    'Chäschtlizäddel '.$reqStufe->name,         // Title.
                     array(&$this, 'example_dashboard_widget_function') // Display function.
            );
    }
@@ -327,22 +359,24 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
      //echo $entry_exist[0];
 
     if($entry_exist[0] == 1){
-      $sql_stmt = "UPDATE $tableName SET von = %s, geaendert= CURRENT_TIMESTAMP, bis = %s, wo = %s, infos = %s WHERE stufen_id = %d";
+      $sql_stmt = "UPDATE $tableName SET von = %s, geaendert= CURRENT_TIMESTAMP, bis = %s, wo = %s, infos = %s, mitnehmen = %s WHERE stufen_id = %d";
       $sql = $wpdb->prepare($sql_stmt,
                            $von->format('Y-m-d H:i:s'),
                            $bis->format('Y-m-d H:i:s'),
                            $_POST['wo'],
-                           $_POST['content'],
+                           $_POST['infos'],
+                           $_POST['mitnehmen'],
                            $stufenId
                           );
     }else{
-      $sql_stmt = "INSERT INTO $tableName (stufen_id, geaendert, von, bis, wo, infos) VALUES (%d, CURRENT_TIMESTAMP, %s, %s, %s, %s)";
+      $sql_stmt = "INSERT INTO $tableName (stufen_id, geaendert, von, bis, wo, infos, mitnehmen) VALUES (%d, CURRENT_TIMESTAMP, %s, %s, %s, %s)";
       $sql = $wpdb->prepare($sql_stmt,
                             $stufenId,
                             $von->format('Y-m-d H:i:s'),
                             $bis->format('Y-m-d H:i:s'),
                             $_POST['wo'],
-                            $_POST['content']
+                            $_POST['infos'],
+                            $_POST['mitnehmen']
                           );
     }
 
@@ -382,7 +416,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // Examples:
         wp_enqueue_script('jquery');
         wp_enqueue_script('jquery-serializejson-js', plugins_url( '/js/jquery.serializejson.min.js', __FILE__ ), array('jquery'));
-        
+
         wp_enqueue_style('chaeschtlizettel-style', plugins_url('/css/chaeschtlizettel.css', __FILE__));
         wp_enqueue_style('clockpicker-style', plugins_url('/css/clockpicker.css', __FILE__));
         wp_enqueue_style('standalone-style', plugins_url('/css/standalone.css', __FILE__));

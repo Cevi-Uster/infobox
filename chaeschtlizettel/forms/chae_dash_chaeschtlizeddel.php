@@ -51,8 +51,13 @@
 	</div>
 
 	<div class="textarea-wrap chae-input-group" id="description-wrap">
-		<h3>Infos / Mitnehmen</h3>
-		<textarea name="content" id="infos" class="mceEditor" rows="3" cols="15" placeholder="Infos / Mitnehmen"autocomplete="off"><?php echo $chaeschtli->infos ?></textarea>
+		<h3>Infos</h3>
+		<textarea name="infos" id="infos" class="mceEditor" rows="3" cols="15" placeholder="Infos"autocomplete="off"><?php echo $chaeschtli->infos ?></textarea>
+	</div>
+
+	<div class="textarea-wrap chae-input-group" id="description-wrap">
+		<h3>Mitnehmen</h3>
+		<textarea name="mitnehmen" id="mitnehmen" class="mceEditor" rows="3" cols="15" placeholder="Mitnehmen"autocomplete="off"><?php echo $chaeschtli->mitnehmen ?></textarea>
 	</div>
 
 	<p class="chae-last-update pull-right">Zuletzt aktualisiert: <?php echo $last_update ?>, Status: <?php echo $status ?></p>
