@@ -521,22 +521,24 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
                 xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
               },
               success: function(data, response) {
-              var html = '<table id="stufenTable" class="table table-striped table-bordered">';
-              html += '<thead>';
-              html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
-              html += '</thead>';
-              html += '<tbody>';
-              //console.log(data);
-              html += data.reduce(function(string, item) {
-                return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name  + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang +  "</td></tr>"
-              }, '');
-              html += '</tbody>';
-              html += '</table>';
-              $('div#stufeTableContainer').html(html);
+                var html = '<table id="stufenTable" class="table table-striped table-bordered">';
+                html += '<thead>';
+                html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
+                html += '</thead>';
+                html += '<tbody>';
+                //console.log(data);
+                html += data.reduce(function(string, item) {
+                  return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name  + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang +  "</td></tr>"
+                }, '');
+                html += '</tbody>';
+                html += '</table>';
+                $('div#stufeTableContainer').html(html);
                 makeTableEditable();
              },
              error: function(XMLHttpRequest, textStatus, errorThrown){
                $('div#errorMessageContainer').html('<p>Could not load Stufen form server. Got error: ' + errorThrown + '</p>');
+               $('div#errorMessageContainer').attr('class', 'alert alert-warning');
+               $('div#errorMessageContainer').attr('role', 'warning');
              }
            });
           }
@@ -569,6 +571,11 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               method: 'POST',
               beforeSend: function ( xhr ) {
                 xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown){
+               $('div#errorMessageContainer').html('<p>Could not create new Stufe. Got error: ' + errorThrown + '</p>');
+               $('div#errorMessageContainer').attr('class', 'alert alert-warning');
+               $('div#errorMessageContainer').attr('role', 'warning');
               },
               data: formData
               } ).done( function ( response ) {
@@ -607,20 +614,31 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
             function loadStufenmemberTable(){
             console.log('Try to load stufenmember from REST');
-            $.get('<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember', {}, function(data, response) {
-              var html = '<table id="stufenmemberTable" class="table table-striped table-bordered">';
-              html += '<thead>';
-              html += '<th>id</th><th>user_name</th><th>stufen_name</th>';
-              html += '</thead>';
-              html += '<tbody>';
-              console.log(data);
-              html += data.reduce(function(string, item) {
-                return string + "<tr><td>" + item.id + "</td><td>" + item.user_name  + "</td><td>" + item.stufen_name + "</td><td>";
-              }, '');
-              html += '</tbody>';
-              html += '</table>';
-              $('div#stufeMemberTableContainer').html(html);
-              loadStufen();
+            $.ajax({
+              url: '<?php get_rest_url(null)?>/wp-json/chaeschtlizettel/v1/stufenmember',
+              beforeSend: function ( xhr ) {
+                xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
+              },
+              success: function(data, response) {
+                var html = '<table id="stufenmemberTable" class="table table-striped table-bordered">';
+                html += '<thead>';
+                html += '<th>id</th><th>user_name</th><th>stufen_name</th>';
+                html += '</thead>';
+                html += '<tbody>';
+                console.log(data);
+                html += data.reduce(function(string, item) {
+                  return string + "<tr><td>" + item.id + "</td><td>" + item.user_name  + "</td><td>" + item.stufen_name + "</td><td>";
+                }, '');
+                html += '</tbody>';
+                html += '</table>';
+                $('div#stufeMemberTableContainer').html(html);
+                loadStufen();
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown){
+                $('div#errorMessageContainer').html('<p>Could not load Stufenmembers form server. Got error: ' + errorThrown + '</p>');
+                $('div#errorMessageContainer').attr('class', 'alert alert-warning');
+                $('div#errorMessageContainer').attr('role', 'warning');
+              }
             });
           }
 
@@ -693,6 +711,11 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
               method: 'POST',
               beforeSend: function ( xhr ) {
                 xhr.setRequestHeader( 'X-WP-Nonce', '<?php echo ($nonce);?>' );
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown){
+                $('div#errorMessageContainer').html('<p>Could not add new Stufenmember. Got error: ' + errorThrown + '</p>');
+                $('div#errorMessageContainer').attr('class', 'alert alert-warning');
+                $('div#errorMessageContainer').attr('role', 'warning');
               },
               data: formData
               } ).done( function ( response ) {

@@ -80,8 +80,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
           'permission_callback' => array( $this, 'get_stufenmember_permission' )
       )
     ));
-
-  register_rest_route( $namespace, '/' . $baseStufenMember."/insert/", array(
+    
+    register_rest_route( $namespace, '/' . $baseStufenMember."/insert/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
           'callback'  => array( $this, 'insert_stufenmember' ),
@@ -89,6 +89,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       ),
       'schema' => array( $this,'get_insert_stufenmember_schema')
     ));
+    
 
     register_rest_route( $namespace, '/' . $baseStufenMember."/update/", array(
       array(
