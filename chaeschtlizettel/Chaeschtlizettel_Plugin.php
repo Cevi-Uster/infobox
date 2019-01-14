@@ -539,8 +539,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           <input type="text" name="name" class="form-control input-sm" value="">
           <label for="abteilung">Abteilung:</label>
             <select name="abteilung" class="form-control input-sm">
-              <option value="m">Knaben</option>
-              <option value="f">M&auml;dchen</option>
+              <option value="m">m</option>
+              <option value="f">f</option>
             </select>
           <label for="jahrgang">Jahrgang:</label>
           <input type="text" class="form-control input-sm" name="jahrgang" value=""><br/>

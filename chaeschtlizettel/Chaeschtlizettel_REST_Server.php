@@ -285,6 +285,8 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       $stufen_name = count($stufen_result) == 1  &&  $stufen_result[0]->name != null ? $stufen_result[0]->name : "<unknown>";
 
       $result[] =array("id"=>$match_user_stufen->id, "user_name"=>$user_name, "stufen_name"=>$stufen_name);
+      $this->sortBy("user_name", $result, false);
+      $this->sortBy("stufen_name", $result, false);
     }
 
     return $result;
@@ -395,5 +397,20 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $result = $wpdb->get_results($sql);
     $chaeschtli = $result[0];    //return $chaeschtli;
     return $chaeschtli;
+  }
+
+  private function sortBy($field, &$array, $direction = 'asc'){
+      usort($array, create_function('$a, $b', '
+          $a = $a["' . $field . '"];
+          $b = $b["' . $field . '"];
+
+          if ($a == $b) return 0;
+
+          $direction = strtolower(trim($direction));
+
+          return ($a ' . ($direction == 'desc' ? '>' : '<') .' $b) ? -1 : 1;
+      '));
+
+      return true;
   }
 }

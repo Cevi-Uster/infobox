@@ -49,7 +49,7 @@ if (typeof jQuery === 'undefined') {
             identifier: [0, 'stufen_id'],
             editable: [
               [1, 'name'],
-              [2, 'abteilung', '{"m": "Knaben", "f": "Mädchen"}'],
+              [2, 'abteilung', '{"m": "m", "f": "f"}'],
               [3, 'jahrgang']
             ]
           }
