@@ -90,7 +90,6 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       'schema' => array( $this,'get_insert_stufenmember_schema')
     ));
     
-
     register_rest_route( $namespace, '/' . $baseStufenMember."/update/", array(
       array(
           'methods' => WP_REST_Server::EDITABLE,
@@ -141,7 +140,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
     $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
-    $sql_stmt = "SELECT stufen_id, name, abteilung, jahrgang FROM $table_name";
+    $sql_stmt = "SELECT stufen_id, name, abteilung, jahrgang FROM $table_name ORDER BY abteilung, jahrgang DESC";
     //$sql = $wpdb->prepare($sql_stmt);
     $result = $wpdb->get_results($sql_stmt, OBJECT);
     return $result;
