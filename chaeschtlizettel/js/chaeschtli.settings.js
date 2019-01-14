@@ -41,6 +41,7 @@ if (typeof jQuery === 'undefined') {
           url: restBaseUrl + '/wp-json/chaeschtlizettel/v1/stufen',
           nonce: nonce,
           restoreButton: false,
+          hideIdentifier: true,
           deleteCallbackFunction: function() {
             loadStufenTable();
           },
@@ -85,7 +86,7 @@ if (typeof jQuery === 'undefined') {
       loadStufenTable();
     }
 
-    
+
     $.fn.StufenMemberTableFunction = function(nonce, restBaseUrl) {
 
       var loadStufenmemberTable = function loadStufenmemberTable() {
@@ -103,7 +104,7 @@ if (typeof jQuery === 'undefined') {
             html += '<tbody>';
             console.log(data);
             html += data.reduce(function(string, item) {
-              return string + "<tr><td>" + item.id + "</td><td>" + item.user_name + "</td><td>" + item.stufen_name + "</td><td>";
+              return string + "<tr><td>" + item.id + "</td><td>" + item.user_name + "</td><td>" + item.stufen_name + "</td></tr>";
             }, '');
             html += '</tbody>';
             html += '</table>';
@@ -164,6 +165,7 @@ if (typeof jQuery === 'undefined') {
           url: restBaseUrl + '/wp-json/chaeschtlizettel/v1/stufenmember',
           nonce: nonce,
           restoreButton: false,
+          hideIdentifier: true,
           deleteCallbackFunction: function() {
             loadStufenmemberTable();
           },
