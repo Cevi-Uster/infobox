@@ -393,9 +393,17 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $table_name = $chaeschtlizettel_plugin->prefixTableName('chaeschtlizettel');
     $sql_stmt = "SELECT * FROM $table_name WHERE stufen_id = %d";
     $sql = $wpdb->prepare($sql_stmt, $stufen_id);
-
+    $timezone = new DateTimeZone(get_option('timezone_string'));
     $result = $wpdb->get_results($sql);
-    $chaeschtli = $result[0];    //return $chaeschtli;
+    $chaeschtli =  array('stufen_id' => $result[0]->stufen_id, 
+      'geaendert' => (new DateTime($result[0]->geaendert, $timezone))->format(DateTime::ATOM),
+      'wo' => $result[0]->wo,
+      'von' => (new DateTime($result[0]->von, $timezone))->format(DateTime::ATOM),  
+      'bis' => (new DateTime($result[0]->bis, $timezone))->format(DateTime::ATOM),    
+      'mitnehmen' => $result[0]->mitnehmen,
+      'infos' => $result[0]->infos,
+    );
+    
     return $chaeschtli;
   }
 

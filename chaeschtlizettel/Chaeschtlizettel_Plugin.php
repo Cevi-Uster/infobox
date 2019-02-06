@@ -336,11 +336,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
      }*/
 
      // create Dates
+     $timezone = new DateTimeZone(get_option('timezone_string'));
      $str_von = $_POST['von-date']." ".$_POST['von-time'];
-     $von = DateTime::createFromFormat('j.m.Y H:i', $str_von);
+     $von = DateTime::createFromFormat('j.m.Y H:i', $str_von, $timezone);
 
      $str_bis = $_POST['bis-date']." ".$_POST['bis-time'];
-     $bis = DateTime::createFromFormat('j.m.Y H:i', $str_bis);
+     $bis = DateTime::createFromFormat('j.m.Y H:i', $str_bis, $timezone);
 
      //echo $von->format('Y-m-d H:i:s');
      //echo $bis->format('Y-m-d H:i:s');
