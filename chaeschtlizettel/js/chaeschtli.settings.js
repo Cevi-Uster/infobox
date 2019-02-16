@@ -41,7 +41,7 @@ if (typeof jQuery === 'undefined') {
           url: restBaseUrl + '/wp-json/chaeschtlizettel/v1/stufen',
           nonce: nonce,
           restoreButton: false,
-          hideIdentifier: true,
+          hideIdentifier: false,
           deleteCallbackFunction: function() {
             loadStufenTable();
           },
@@ -165,7 +165,7 @@ if (typeof jQuery === 'undefined') {
           url: restBaseUrl + '/wp-json/chaeschtlizettel/v1/stufenmember',
           nonce: nonce,
           restoreButton: false,
-          hideIdentifier: true,
+          hideIdentifier: false,
           deleteCallbackFunction: function() {
             loadStufenmemberTable();
           },

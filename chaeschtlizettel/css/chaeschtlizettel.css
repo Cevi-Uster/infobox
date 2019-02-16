@@ -22,10 +22,21 @@
 /** stylesheetfile for the chaeschtlizettel plugin */
 
 .chae-wrapper{
-  background-color: #EAE9E9;
-  border-color: #838282;
-  padding: 6px;
-  margin: 10px
+  /*background-color: #EAE9E9;*/
+  /*border-color: #838282;*/
+  background: url("../images/note.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  /*width:400px;*/
+  min-height:800px;
+  padding-top: 160px;
+  padding-left: 80px;
+  padding-bottom: 80px;
+  padding-right: 40px;
+  /*margin: 10px;*/
+}
+.chae-public-content{
+  padding: 5px;
 }
 
 /* dashboard styles */

@@ -192,20 +192,20 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       try {
         global $wpdb;
 
-        // stufen id suchen
+        $stufenId = intval($atts['stufenid']);
+
+        // stufen name suchen
         $tableName = $this->prefixTableName('stufen');
-        $sql_stmt = "SELECT stufen_id FROM $tableName WHERE name = %s";
-        $sql = $wpdb->prepare($sql_stmt, $atts['stufe']);
+        $sql_stmt = "SELECT name FROM $tableName WHERE stufen_id = %s";
+        $sql = $wpdb->prepare($sql_stmt, $atts['stufenid']);
+        $stufenName = $wpdb->get_results($sql)[0]->name;
 
-        $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
-
+        // chäschtli infos suchen
         $tableName = $this->prefixTableName('chaeschtlizettel');
         $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
         $sql = $wpdb->prepare($sql_stmt, $stufenId);
-        //echo $sql;
 
         $result = $wpdb->get_results($sql);
-        //var_dump($result);
         $chaeschtli = $result[0];
 
         // datum formatieren
@@ -214,17 +214,21 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
         if($von != NULL || $bis != NULL){
           if($von->format('Y-m-d') == $bis->format('Y-m-d')){
-            $zeit = $von->format('j.m.Y H:i').' - '.$bis->format('H:i');
+            $zeit = $von->format('j.m.Y   H:i').' - '.$bis->format('H:i');
           }else{
-            $zeit = $von->format('j.m.Y H:i').' - '.$bis->format('j.m.Y H:i');
+            $zeit = $von->format('j.m.Y   H:i').' - '.$bis->format('j.m.Y H:i');
           }
 
           $now = date('Y-m-d');
           if($von->format('Y-m-d') < $now){
-            return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><p>Keine aktuellen Informationen verfügbar.</p></div>';
+            $expired = true;
           }else{
-            return '<div class="chae-wrapper"><h3>Chäschtli '.$atts['stufe'].'</h3><h6>Treffpunkt</h6><p>'.$zeit.'<br>'.$chaeschtli->wo.'</p><h6>Infos</h6><p>'.$chaeschtli->infos.'</p><h6>Mitnehmen</h6><p>'.$chaeschtli->mitnehmen.'</p></div>';
+            $expired = false;
           }
+          ob_start();
+            include("forms/chae_public_chaeschtlizettel.php");
+          return ob_get_clean();
+
         }
       } catch (Exception $e) {
         echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
@@ -434,7 +438,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           wp_enqueue_script('jquery-ui-tabs');
           wp_enqueue_script( 'table-edit-script', plugins_url( '/js/jquery.tabledit.js', __FILE__ ), array('jquery') );
           wp_enqueue_script( 'chaeschtli-settings-script', plugins_url( '/js/chaeschtli.settings.js', __FILE__ ), array('jquery') );
-          
+
           // enqueue any othere scripts/styles you need to use
         }
 
