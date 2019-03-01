@@ -347,11 +347,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
      $str_bis = $_POST['bis-date']." ".$_POST['bis-time'];
      $bis = DateTime::createFromFormat('j.m.Y H:i', $str_bis, $timezone);
 
-     //echo $von->format('Y-m-d H:i:s');
-     //echo $bis->format('Y-m-d H:i:s');
+     $wo = stripslashes($_POST['wo']);
+     $infos = stripslashes($_POST['infos']);
+     $mitnehmen = stripslashes($_POST['mitnehmen']);
 
      $stufenId = intval($_POST['stufe']);
-     //echo "Stufe: ".$stufenId;
+
      $tableName = $this->prefixTableName('chaeschtlizettel');
 
      $sql_stmt = "SELECT COUNT(*) FROM $tableName WHERE stufen_id = %d";
@@ -368,9 +369,9 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       $sql = $wpdb->prepare($sql_stmt,
                            $von->format('Y-m-d H:i:s'),
                            $bis->format('Y-m-d H:i:s'),
-                           $_POST['wo'],
-                           $_POST['infos'],
-                           $_POST['mitnehmen'],
+                           $wo,
+                           $infos,
+                           $mitnehmen,
                            $stufenId
                           );
     }else{
@@ -379,9 +380,9 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
                             $stufenId,
                             $von->format('Y-m-d H:i:s'),
                             $bis->format('Y-m-d H:i:s'),
-                            $_POST['wo'],
-                            $_POST['infos'],
-                            $_POST['mitnehmen']
+                            $wo,
+                            $infos,
+                            $mitnehmen
                           );
     }
 
