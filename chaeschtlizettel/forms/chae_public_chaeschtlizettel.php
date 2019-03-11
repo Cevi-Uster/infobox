@@ -5,8 +5,8 @@
       <p>Keine aktuellen Informationen verfügbar.</p>
     <?php } else { ?>
       <h6>Treffpunkt</h6><p><?php echo $zeit ?><br><?php echo $chaeschtli->wo ?></p>
-      <h6>Infos</h6><p><?php echo $chaeschtli->infos ?></p>
-      <h6>Mitnehmen</h6><p><?php echo $chaeschtli->mitnehmen?></p>
+      <h6>Infos</h6><p><?php echo nl2br($chaeschtli->infos) ?></p>
+      <h6>Mitnehmen</h6><p><?php echo nl2br($chaeschtli->mitnehmen) ?></p>
     <?php }; ?>
   </div>
 </div>
