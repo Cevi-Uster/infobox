@@ -271,20 +271,25 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         // datum formatieren
         $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
         $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
+        if ($von == false){
+          $von = NULL;
+        }
+        if ($bis == false){
+          $bis = NULL;
+        }
 
         $now = date('Y-m-d');
-        if($von != NULL || $bis != NULL){
-          if($von->format('Y-m-d') < $now){
-            $status = "abgelaufen";
-            $chaeschtli->infos = "";
-            $chaeschtli->mitnehmen = "";
-            $chaeschtli->wo = "";
-            $von = DateTime::createFromFormat('H:i', '14:00');
-            $bis = DateTime::createFromFormat('H:i', '17:00');
-          }else{
-            $status = "noch gültig";
-          }
+        if($von == NULL || $von->format('Y-m-d') < $now){
+          $status = "abgelaufen";
+          $chaeschtli->infos = "";
+          $chaeschtli->mitnehmen = "";
+          $chaeschtli->wo = "";
+          $von = DateTime::createFromFormat('H:i', '14:00');
+          $bis = DateTime::createFromFormat('H:i', '17:00');
+        } else {
+          $status = "noch gültig";
         }
+        
 
       }catch (Exception $e) {
         echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
