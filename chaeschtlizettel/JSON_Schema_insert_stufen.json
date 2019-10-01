@@ -6,7 +6,6 @@
    "title": "Update Stufe Schema",
    "default": null,
    "required": [
-     "stufen_id",
      "name"
    ],
    "properties": {
@@ -39,5 +38,15 @@
        "examples": [
          "2011"
        ]
-     }
+    },
+    "email": {
+       "$id": "#/properties/email",
+       "type": "string",
+       "title": "E-Mail",
+       "default": "",
+       "examples": [
+         "test@example.com"
+       ],
+       "format": "email"
+    }
 }

@@ -2,7 +2,7 @@
 /*
    Plugin Name: Chäschtlizettel
    Plugin URI: http://wordpress.org/extend/plugins/chaeschtlizettel/
-   Version: 1.1
+   Version: 1.2
    Author: Matthias Kunz
    Description: Provides Information for Meetingpoints in YMCA Scouting
    Text Domain: chaeschtlizettel

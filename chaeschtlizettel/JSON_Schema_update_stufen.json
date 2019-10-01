@@ -47,6 +47,16 @@
        "examples": [
          "2011"
        ]
-     }
+     },
+    "email": {
+       "$id": "#/properties/email",
+       "type": "string",
+       "title": "E-Mail",
+       "default": "",
+       "examples": [
+         "test@example.com"
+       ],
+       "format": "email"
+    }
    }
 }

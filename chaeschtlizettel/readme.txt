@@ -25,5 +25,15 @@ Provides Information for Meetingpoints in YMCA Scouting
 
 == Changelog ==
 
+= 1.2 =
+-  New data row stufe.email for simple deregistration of participant from next program.
+
+= 1.0 =
+- First release
+
+= 0.4 =
+- Initial Revision
+- New data rows stufe.abteilung, stufe.jahrgang, chaeschlizettel.mitnehmen
+
 = 0.1 =
 - Initial Revision

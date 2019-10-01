@@ -82,6 +82,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             name VARCHAR(100),
             abteilung VARCHAR(30),
             jahrgang INTEGER,
+            email VARCHAR(320),
             PRIMARY KEY (stufen_id)
         )$charset_collate;");
 
@@ -158,6 +159,12 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
           }
         }
 
+        if ($this->isVersionLessThan($savedVersion, '1.2')) {
+          $tableName = $this->prefixTableName('stufen');
+          if (!$this->tableColumnExists($tableName, "email")){
+            $upgradeOk  = $upgradeOk && $wpdb->query("ALTER TABLE $tableName ADD COLUMN email VARCHAR(320)");
+          }
+        }
 
         // Post-upgrade, set the current version in the options
         $codeVersion = $this->getVersion();
@@ -555,6 +562,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
             </select>
           <label for="jahrgang">Jahrgang:</label>
           <input type="text" class="form-control input-sm" name="jahrgang" value=""><br/>
+          <label for="email">E-Mail:</label>
+          <input type="text" class="form-control input-sm" name="email" value=""><br/>
           <input type="submit" id="newStufeFormSubmitButton" value="Hinzuf&uuml;gen">
         </div>
       </form>

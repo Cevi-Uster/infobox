@@ -16,12 +16,12 @@ if (typeof jQuery === 'undefined') {
           success: function(data, response) {
             var html = '<table id="stufenTable" class="table table-striped table-bordered">';
             html += '<thead>';
-            html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th>';
+            html += '<th>stufen_id</th><th>name</th><th>abteilung</th><th>jahrgang</th><th>e-mail</th>';
             html += '</thead>';
             html += '<tbody>';
             //console.log(data);
             html += data.reduce(function(string, item) {
-              return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang + "</td></tr>"
+              return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang + "</td><td>" + item.email + "</td></tr>"
             }, '');
             html += '</tbody>';
             html += '</table>';
@@ -50,7 +50,8 @@ if (typeof jQuery === 'undefined') {
             editable: [
               [1, 'name'],
               [2, 'abteilung', '{"m": "m", "f": "f"}'],
-              [3, 'jahrgang']
+              [3, 'jahrgang'],
+              [4, 'email']
             ]
           }
         });
