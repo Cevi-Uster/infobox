@@ -1,4 +1,7 @@
 <div class="chae-wrapper">
+  <div style="text-align: right">
+    <a class="wp-block-button__link has-background has-vivid-cyan-blue-background-color" href="#kontakt">Abmelden</a>
+  </div>
   <div class="chae-public-content">
     <h3><b>Chäschtli <?php echo $stufenName ?></b></h3>
     <?php if($expired){ ?>
