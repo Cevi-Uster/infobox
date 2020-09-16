@@ -21,7 +21,7 @@ if (typeof jQuery === 'undefined') {
             html += '<tbody>';
             //console.log(data);
             html += data.reduce(function(string, item) {
-              return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang + "</td><td>" + item.email + "</td></tr>"
+              return string + "<tr><td>" + item.stufen_id + "</td><td>" + item.name + "</td><td>" + item.abteilung + "</td><td>" + item.jahrgang + "</td><td>" + item.email + "</td></tr>";
             }, '');
             html += '</tbody>';
             html += '</table>';
@@ -34,7 +34,7 @@ if (typeof jQuery === 'undefined') {
             $('div#errorMessageContainer').attr('role', 'warning');
           }
         });
-      }
+      };
 
       var makeTableEditable = function makeTableEditable() {
         $('#stufenTable').Tabledit({
@@ -55,7 +55,7 @@ if (typeof jQuery === 'undefined') {
             ]
           }
         });
-      }
+      };
 
       var addNewStufe = function addNewStufe() {
         var formData = JSON.stringify($('#newStufeForm').serializeJSON());
@@ -77,7 +77,7 @@ if (typeof jQuery === 'undefined') {
           $("#newStufeForm")[0].reset();
           loadStufenTable();
         });
-      }
+      };
 
       document.getElementById("newStufeFormSubmitButton").addEventListener("click", function(event) {
         event.preventDefault();
@@ -85,7 +85,7 @@ if (typeof jQuery === 'undefined') {
       });
 
       loadStufenTable();
-    }
+    };
 
 
     $.fn.StufenMemberTableFunction = function(nonce, restBaseUrl) {
@@ -118,7 +118,7 @@ if (typeof jQuery === 'undefined') {
             $('div#errorMessageContainer').attr('role', 'warning');
           }
         });
-      }
+      };
 
       var loadStufen = function loadStufen() {
         $.get(restBaseUrl + '/wp-json/chaeschtlizettel/v1/stufen', {}, function(data, response) {
@@ -131,7 +131,7 @@ if (typeof jQuery === 'undefined') {
           $('select#newStufenmemberStufenName').html(stufenOptionHtml);
           loadUsers(1, stufenNames);
         });
-      }
+      };
 
       var loadUsers = function loadUsers(page, stufenNames, userNames) {
         var perPage = 10;
@@ -141,24 +141,37 @@ if (typeof jQuery === 'undefined') {
         if (userNames === undefined) {
           userNames = {};
         }
-        $.get(restBaseUrl + '/wp-json/wp/v2/users?per_page=' + perPage + '&page=' + page, {}, function(data, response) {
-          data.forEach(function(user) {
-            userNames[user.name] = user.name;
-          });
-          console.log(userNames);
-          if (data.length == perPage) {
-            page++;
-            loadUsers(page, stufenNames, userNames);
-          } else {
-            var userOptionHtml = "";
-            for (var key in userNames) {
-              userOptionHtml += '<option value="' + userNames[key] + '">' + userNames[key] + '</option>';
+        
+        $.ajax({
+          url: restBaseUrl + '/wp-json/wp/v2/users?per_page=' + perPage + '&page=' + page,
+          type: "GET",
+          beforeSend: function(xhr) {
+              xhr.setRequestHeader('X-WP-Nonce', nonce);
+          },
+          success: function(data, response) {
+            data.forEach(function(user) {
+              userNames[user.id] = user.name;
+            });
+            console.log(userNames);
+            if (data.length == perPage) {
+              page++;
+              loadUsers(page, stufenNames, userNames);
+            } else {
+              var userOptionHtml = "";
+              for (var key in userNames) {
+                userOptionHtml += '<option value="' + key + '">' + userNames[key] + '</option>';
+              }
+              $('select#newStufenmemberUserName').html(userOptionHtml);
+              makeTableEditable(JSON.stringify(stufenNames), JSON.stringify(userNames));
             }
-            $('select#newStufenmemberUserName').html(userOptionHtml);
-            makeTableEditable(JSON.stringify(stufenNames), JSON.stringify(userNames));
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            $('div#errorMessageContainer').html('<p>Could not load users form server. Got error: ' + errorThrown + '</p>');
+            $('div#errorMessageContainer').attr('class', 'alert alert-warning');
+            $('div#errorMessageContainer').attr('role', 'warning');
           }
         });
-      }
+      };
 
       var makeTableEditable = function makeTableEditable(stufenNames, userNames) {
         console.log('Make stufenmemberTable editable');
@@ -178,7 +191,7 @@ if (typeof jQuery === 'undefined') {
             ]
           }
         });
-      }
+      };
 
       var addNewStufenmember = function addNewStufenmember() {
         var formData = JSON.stringify($('#newStufenmemberForm').serializeJSON());
@@ -200,7 +213,7 @@ if (typeof jQuery === 'undefined') {
           $("#newStufenmemberForm")[0].reset();
           loadStufenmemberTable();
         });
-      }
+      };
 
       document.getElementById("newStufenmemberFormSubmitButton").addEventListener("click", function(event) {
         event.preventDefault();
@@ -208,8 +221,9 @@ if (typeof jQuery === 'undefined') {
       });
 
       loadStufenmemberTable();
-    }
+    };
     return this;
 
   }
   (jQuery));
+^
