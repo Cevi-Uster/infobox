@@ -584,8 +584,8 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
       Neues Stufenmitglied:<br/>
       <form id="newStufenmemberForm">
         <div class="form-group">
-          <label for="user_name">User name:</label>
-          <select type="text" name="user_name" id="newStufenmemberUserName" class="form-control input-sm">
+          <label for="user_id">User name:</label>
+          <select type="text" name="user_id" id="newStufenmemberUserName" class="form-control input-sm">
           </select>
           <label for="stufen_name">Stufenname:</label>
           <select name="stufen_name" id="newStufenmemberStufenName" class="form-control input-sm">

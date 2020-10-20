@@ -141,7 +141,6 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     global $wpdb;
     $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
     $sql_stmt = "SELECT stufen_id, name, abteilung, jahrgang, email FROM $table_name ORDER BY abteilung, jahrgang DESC";
-    //$sql = $wpdb->prepare($sql_stmt);
     $result = $wpdb->get_results($sql_stmt, OBJECT);
     return $result;
   }
@@ -162,10 +161,16 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
     if ($action === 'edit' && isset($stufen_id) && isset($name)){
       $wpdb->show_errors(); 
-      return $wpdb->update($table_name, array('name' => $name), array('stufen_id' => $stufen_id), array('%s'), array('%d'));
+      $wpdb->query( 'SET autocommit = 0;' );
+      $result = $wpdb->update($table_name, array('name' => $name), array('stufen_id' => $stufen_id), array('%s'), array('%d'));
+      $wpdb->query( 'COMMIT;' );
+      return $result;
     } else if ($action === 'delete' && isset($stufen_id)){
       $wpdb->show_errors(); 
-      return $wpdb->delete($table_name,  array('stufen_id' => $stufen_id), array('%d'));
+      $wpdb->query( 'SET autocommit = 0;' );
+      $result = $wpdb->delete($table_name,  array('stufen_id' => $stufen_id), array('%d'));
+      $wpdb->query( 'COMMIT;' );
+      return $result;
     }
     //return 'bad request';
     return $json_request;
@@ -188,11 +193,14 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     if (isset($json_request['stufen_id']) && isset($json_request['name'])) {
       $wpdb->show_errors(); 
-      return $wpdb->update($table_name, array('name' => $json_request['name'], 
+      $wpdb->query( 'SET autocommit = 0;' );
+      $result = $wpdb->update($table_name, array('name' => $json_request['name'], 
           'abteilung' => $json_request['abteilung'], 
           'jahrgang' => $json_request['jahrgang'], 
           'email' => $json_request['email']), 
         array('stufen_id' => $json_request['stufen_id']), array('%s'), array('%d'));
+      $wpdb->query( 'COMMIT;' );
+      return $result;
     }
     return 'bad request';
   }
@@ -215,6 +223,7 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       $wpdb->show_errors(); 
       $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
       $chaeschtlizettel_table_name = $chaeschtlizettel_plugin->prefixTableName('chaeschtlizettel');
+      $wpdb->query( 'SET autocommit = 0;' );
       $status = $wpdb->insert($stufen_table_name, array('name' => $json_request['name'], 
           'erstellt' => current_time( 'mysql' ), 
           'abteilung' => $json_request['abteilung'], 
@@ -229,8 +238,10 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
         $status = $wpdb->insert($chaeschtlizettel_table_name, array('stufen_id' => $stufen_id, 
           'wo' => 'undefined'), 
           array('%s', '%s'));
+        $wpdb->query( 'COMMIT;' );
         return $status;
       }
+      $wpdb->query( 'ROLLBACK;' );
     }
     return 'bad request';
   }
@@ -254,10 +265,15 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     if (isset($json_request['stufen_id'])) {
       $wpdb->show_errors(); 
+      $wpdb->query( 'SET autocommit = 0;' );
       if ($wpdb->delete($stufen_table_name, array('stufen_id' => $json_request['stufen_id']), array('%d'))){
-       return $wpdb->delete($chaeschtlizettel_table_name, array('stufen_id' => $json_request['stufen_id']), array('%d'));
+        $result = $wpdb->delete($chaeschtlizettel_table_name, array('stufen_id' => $json_request['stufen_id']), array('%d'));
+        $wpdb->query( 'COMMIT;' );
+        return $result;
       }
+      $wpdb->query( 'ROLLBACK;' );
     }
+
     return 'bad request';
   }
 
@@ -308,10 +324,11 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
     $chaeschtlizettel_plugin = new Chaeschtlizettel_Plugin();
     global $wpdb;
 
-    if (isset($json_request['user_name']) && isset($json_request['stufen_name'])) {
+    if (isset($json_request['user_id']) && isset($json_request['stufen_name'])) {
       $wpdb->show_errors();
-      $user_name=$json_request['user_name'];
-      $user = get_user_by('login', $user_name);
+      $wpdb->query( 'SET autocommit = 0;' );
+      $user_id=$json_request['user_id'];
+      $user = get_user_by('ID', $user_id);
 
       $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
       $sql_stmt = "SELECT stufen_id FROM $stufen_table_name WHERE name = %s";
@@ -320,9 +337,12 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       $stufen_id = intval($wpdb->get_results($sql)[0]->stufen_id);
       
       $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
-      return $wpdb->insert($match_user_stufen_table_name, array('user_id' => $user->id, 
+      $result =  $wpdb->insert($match_user_stufen_table_name, array('user_id' => $user->id, 
           'stufen_id' => $stufen_id),  array('%s'));
+      $wpdb->query( 'COMMIT;' );
+      return $result;
     }
+    $wpdb->query( 'ROLLBACK;' );
     return 'bad request';
   }
 
@@ -342,8 +362,9 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     if (isset($json_request['id']) && isset($json_request['user_name']) && isset($json_request['stufen_name'])) {
       $wpdb->show_errors();
+      $wpdb->query( 'SET autocommit = 0;' );
       $user_name=$json_request['user_name'];
-      $user = get_user_by('login', $user_name);
+      $user = get_user_by('slug', $user_name);
 
       $stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('stufen');
       $sql_stmt = "SELECT stufen_id FROM $stufen_table_name WHERE name = %s";
@@ -352,8 +373,10 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
       $stufen_id = intval($wpdb->get_results($sql)[0]->stufen_id);
       
       $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
-      return $wpdb->update($match_user_stufen_table_name, array('user_id' => $user->id, 
+      $result = $wpdb->update($match_user_stufen_table_name, array('user_id' => $user->id, 
           'stufen_id' => $stufen_id), array('id' => $json_request['id']), array('%s'), array('%d'));
+      $wpdb->query( 'COMMIT;' );
+      return $result;
     }
     return 'bad request';
   }
@@ -374,9 +397,11 @@ class Chaeschtlizettel_REST_Server extends WP_REST_Controller {
 
     if (isset($json_request['id'])) {
       $wpdb->show_errors();
-         
+      $wpdb->query( 'SET autocommit = 0;' );   
       $match_user_stufen_table_name = $chaeschtlizettel_plugin->prefixTableName('match_user_stufen');
-      return $wpdb->delete($match_user_stufen_table_name, array('id' => $json_request['id']), array('%d'));
+      $result = $wpdb->delete($match_user_stufen_table_name, array('id' => $json_request['id']), array('%d'));
+      $wpdb->query( 'COMMIT;' );
+      return $result;
     }
     return 'bad request';
   }
