@@ -43,7 +43,7 @@ if (typeof jQuery === 'undefined') {
           restoreButton: false,
           hideIdentifier: false,
           deleteCallbackFunction: function() {
-            loadStufenTable();
+            setTimeout(loadStufenTable, 500);
           },
           columns: {
             identifier: [0, 'stufen_id'],
@@ -181,7 +181,7 @@ if (typeof jQuery === 'undefined') {
           restoreButton: false,
           hideIdentifier: false,
           deleteCallbackFunction: function() {
-            loadStufenmemberTable();
+            setTimeout(loadStufenmemberTable, 500);
           },
           columns: {
             identifier: [0, 'id'],
