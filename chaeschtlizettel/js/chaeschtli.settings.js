@@ -178,6 +178,7 @@ if (typeof jQuery === 'undefined') {
         $('#stufenmemberTable').Tabledit({
           url: restBaseUrl + '/wp-json/chaeschtlizettel/v1/stufenmember',
           nonce: nonce,
+          editButton: false,
           restoreButton: false,
           hideIdentifier: false,
           deleteCallbackFunction: function() {
