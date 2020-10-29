@@ -245,7 +245,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     /**
      * Create the function to output the contents of our Dashboard Widget.
      */
-    public function example_dashboard_widget_function() {
+    public function infobox_dashboard_widget_function() {
       try{
         // Display dashboard widget content
         $user = get_current_user_id();
@@ -310,7 +310,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     *
     * This function is hooked into the 'wp_dashboard_setup' action below.
     */
-   public function example_add_dashboard_widgets() {
+   public function add_dashboard_widgets() {
      // stufenname hohlen
      // Display dashboard widget content
      $user = get_current_user_id();
@@ -338,7 +338,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
      wp_add_dashboard_widget(
                     'chae_dash',         // Widget slug.
                     'Chäschtlizäddel '.$reqStufe->name,         // Title.
-                    array(&$this, 'example_dashboard_widget_function') // Display function.
+                    array(&$this, 'infobox_dashboard_widget_function') // Display function.
            );
    }
 
@@ -499,7 +499,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         add_action('wp_ajax_SaveNewChaeschtli', array(&$this, 'ajaxSaveNewChaeschtli') );
 
         // add dashboard widget
-        add_action( 'wp_dashboard_setup', array(&$this, 'example_add_dashboard_widgets') );
+        add_action( 'wp_dashboard_setup', array(&$this, 'add_dashboard_widgets') );
 
 
         // Register REST Server
