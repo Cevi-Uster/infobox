@@ -238,7 +238,42 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
         }
       } catch (Exception $e) {
-        echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
+        echo 'Error in showChaeschtli: ',  $e->getMessage(), "\n";
+      }
+    }
+
+    public function overview_dashboard_widget_function() {
+      try {
+        global $wpdb;
+        $tableNameInfobox = $this->prefixTableName('chaeschtlizettel');
+        $tableNameStufen = $this->prefixTableName('stufen');
+
+        $sql_stmt = "SELECT s.name, s.abteilung, s.jahrgang, i.von, i.bis";
+        $sql_stmt .= " FROM $tableNameStufen s INNER JOIN $tableNameInfobox i ON s.stufen_id = i.stufen_id";
+        $sql_stmt .= " ORDER BY s.abteilung, s.jahrgang DESC;";
+        $result = $wpdb->get_results($sql_stmt, OBJECT);
+        //print("<pre>".print_r($result,true)."</pre>");
+        echo("<table id='dashboardStufenOverviewTable'>");
+        echo("<tr><th style='text-align: left'>Stufe</th><th style='text-align: left'>Chäschlizettel status</th></tr>");
+        foreach ($result as $row) {
+
+          // datum formatieren
+          $bis = DateTime::createFromFormat('Y-m-j H:i:s', $row->bis);
+          if ($bis == false){
+            $bis = NULL;
+          }
+          $infoboxStatus = 'aktuell';
+          $now = date('Y-m-d');
+          if($bis == NULL || $bis->format('Y-m-d') < $now){
+            $infoboxStatus = 'abgelaufen';
+          }
+          echo("<tr>");
+          echo("<td style='text-align: left'>$row->name</td><td style='text-align: left'>$infoboxStatus</td>");
+          echo("</tr>");
+        } 
+        echo('</table>');
+      } catch (Exception $e) {
+        echo 'Error in overview_dashboard_widget_function: ',  $e->getMessage(), "\n";
       }
     }
 
@@ -273,7 +308,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
 
         if($chaeschtli != NULL){
           $last_update = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->geaendert)->format('j.m.Y H:i');
-        }//var_dump($chaeschtli);
+        }
 
         // datum formatieren
         $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
@@ -298,7 +333,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         }
         
 
-      }catch (Exception $e) {
+      } catch (Exception $e) {
         echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
       }
 
@@ -311,35 +346,43 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     * This function is hooked into the 'wp_dashboard_setup' action below.
     */
    public function add_dashboard_widgets() {
-     // stufenname hohlen
-     // Display dashboard widget content
-     $user = get_current_user_id();
+    // stufenname hohlen
+    // Display dashboard widget content
+    $user = get_current_user_id();
 
-     global $wpdb;
+    global $wpdb;
 
-     // stufen id suchen
-     $tableName = $this->prefixTableName('match_user_stufen');
-     $sql_stmt = "SELECT stufen_id FROM $tableName WHERE user_id = %s";
-     $sql = $wpdb->prepare($sql_stmt,
-                           $user
-                           );
+    // stufen id suchen
+    $tableName = $this->prefixTableName('match_user_stufen');
+    $sql_stmt = "SELECT stufen_id FROM $tableName WHERE user_id = %s";
+    $sql = $wpdb->prepare($sql_stmt,
+                          $user
+                          );
 
-     $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
+    $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
 
-     $tableName = $this->prefixTableName('stufen');
-     $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
-     $sql = $wpdb->prepare($sql_stmt,
-                           $stufenId
-                           );
+    $tableName = $this->prefixTableName('stufen');
+    $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
+    $sql = $wpdb->prepare($sql_stmt,
+                          $stufenId
+                          );
 
-     $result = $wpdb->get_results($sql);
-     $reqStufe = $result[0];
+    $result = $wpdb->get_results($sql);
+    $reqStufe = $result[0];
 
-     wp_add_dashboard_widget(
-                    'chae_dash',         // Widget slug.
-                    'Chäschtlizäddel '.$reqStufe->name,         // Title.
-                    array(&$this, 'infobox_dashboard_widget_function') // Display function.
-           );
+    wp_add_dashboard_widget(
+                  'chae_dash',         // Widget slug.
+                  'Chäschtlizäddel '.$reqStufe->name,         // Title.
+                  array(&$this, 'infobox_dashboard_widget_function') // Display function.
+    );
+
+    //overview_dashboard_widget_function
+    wp_add_dashboard_widget(
+      'chae_overview_dash',         // Widget slug.
+      'Chäschtlizäddel Übersicht',         // Title.
+      array(&$this, 'overview_dashboard_widget_function') // Display function.
+    );
+
    }
 
    public function ajaxSaveNewChaeschtli() {
