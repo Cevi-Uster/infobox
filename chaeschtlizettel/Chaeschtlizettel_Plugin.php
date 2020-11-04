@@ -75,7 +75,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         $charset_collate = $wpdb->get_charset_collate();
 
         $tableName = $this->prefixTableName('stufen');
-        echo "db ".$tableName." erstellen";
+       
         $wpdb->query("CREATE TABLE IF NOT EXISTS $tableName (
             stufen_id INTEGER(16) NOT NULL AUTO_INCREMENT,
             erstellt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -87,7 +87,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         )$charset_collate;");
 
         $tableName = $this->prefixTableName('match_user_stufen');
-        echo "db ".$tableName." erstellen";
+ 
         $wpdb->query("CREATE TABLE IF NOT EXISTS $tableName (
             id INTEGER(16) NOT NULL AUTO_INCREMENT,
             user_id INTEGER(16) NOT NULL,
@@ -97,7 +97,7 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
         )$charset_collate;");
 
         $tableName = $this->prefixTableName('chaeschtlizettel');
-        echo "db ".$tableName." erstellen";
+
         $wpdb->query("CREATE TABLE IF NOT EXISTS $tableName (
             stufen_id INTEGER(16) NOT NULL,
             geaendert datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

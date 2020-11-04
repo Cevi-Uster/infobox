@@ -26,7 +26,6 @@ class Chaeschtlizettel_LifeCycle extends Chaeschtlizettel_InstallIndicator {
 
     public function install() {
 
-      echo "plugin install";
         // Initialize Plugin Options
         $this->initOptions();
 
