@@ -283,61 +283,61 @@ class Chaeschtlizettel_Plugin extends Chaeschtlizettel_LifeCycle {
     public function infobox_dashboard_widget_function() {
       try{
         // Display dashboard widget content
-        $user = get_current_user_id();
+        $user_id = get_current_user_id();
 
         global $wpdb;
 
         // stufen id suchen
         $tableName = $this->prefixTableName('match_user_stufen');
         $sql_stmt = "SELECT stufen_id FROM $tableName WHERE user_id = %s";
-        $sql = $wpdb->prepare($sql_stmt,
-                              $user
-                              );
+        $sql = $wpdb->prepare($sql_stmt, $user_id);
 
         $stufenId = intval($wpdb->get_results($sql)[0]->stufen_id);
 
-        $tableName = $this->prefixTableName('chaeschtlizettel');
-        $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
-        $sql = $wpdb->prepare($sql_stmt,
-                              $stufenId
-                              );
-        //echo $sql;
+        $found = false;
+        if ($stufenId !=NULL){
+          $tableName = $this->prefixTableName('chaeschtlizettel');
+          $sql_stmt = "SELECT * FROM $tableName WHERE stufen_id = %d";
+          $sql = $wpdb->prepare($sql_stmt, $stufenId);
+          //echo $sql;
 
-        $result = $wpdb->get_results($sql);
-        $chaeschtli = $result[0];
+          $result = $wpdb->get_results($sql);
+          $chaeschtli = $result[0];
 
-        if($chaeschtli != NULL){
-          $last_update = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->geaendert)->format('j.m.Y H:i');
-        }
+          if($chaeschtli != NULL){
+            $found = true;
+            $last_update = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->geaendert)->format('j.m.Y H:i');
+            // datum formatieren
+            $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
+            $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
+            if ($von == false){
+              $von = NULL;
+            }
+            if ($bis == false){
+              $bis = NULL;
+            }
 
-        // datum formatieren
-        $von = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->von);
-        $bis = DateTime::createFromFormat('Y-m-j H:i:s', $chaeschtli->bis);
-        if ($von == false){
-          $von = NULL;
-        }
-        if ($bis == false){
-          $bis = NULL;
-        }
-
-        $now = date('Y-m-d');
-        if($von == NULL || $von->format('Y-m-d') < $now){
-          $status = "abgelaufen";
-          $chaeschtli->infos = "";
-          $chaeschtli->mitnehmen = "";
-          $chaeschtli->wo = "";
-          $von = DateTime::createFromFormat('H:i', '14:00');
-          $bis = DateTime::createFromFormat('H:i', '17:00');
+            $now = date('Y-m-d');
+            if($von == NULL || $von->format('Y-m-d') < $now){
+              $status = "abgelaufen";
+              $chaeschtli->infos = "";
+              $chaeschtli->mitnehmen = "";
+              $chaeschtli->wo = "";
+              $von = DateTime::createFromFormat('H:i', '14:00');
+              $bis = DateTime::createFromFormat('H:i', '17:00');
+            } else {
+              $status = "noch gültig";
+            }
+          }
+        }  
+        if (!$found){
+          echo '<div class="input-text-wrap" id="title-wrap"><h3>Fehler</h3><p>Stufe nicht definiert</p></div>';
         } else {
-          $status = "noch gültig";
+          include("forms/chae_dash_chaeschtlizeddel.php");
         }
-        
-
       } catch (Exception $e) {
         echo 'Fehler entdeckt Hurra: ',  $e->getMessage(), "\n";
       }
-
-      include("forms/chae_dash_chaeschtlizeddel.php");
     }
 
     /**
