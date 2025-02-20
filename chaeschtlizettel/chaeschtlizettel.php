@@ -2,7 +2,7 @@
 /*
    Plugin Name: Chäschtlizettel
    Plugin URI: http://wordpress.org/extend/plugins/chaeschtlizettel/
-   Version: 1.7
+   Version: 1.8
    Author: Matthias Kunz
    Description: Provides information for meetings in YMCA Scouting
    Text Domain: chaeschtlizettel
@@ -30,7 +30,7 @@
     If not, see http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-$Chaeschtlizettel_minimalRequiredPhpVersion = '4.9';
+$Chaeschtlizettel_minimalRequiredPhpVersion = '8.0';
 
 /**
  * Check the PHP version and give a useful error message if the user's version is less than the required version
